@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,6 +17,15 @@ import org.yaml.snakeyaml.Yaml;
 
 public class MessagePasser {
 
+	public enum ActionType{
+		Drop, // any message will be ignored/dropped
+		Duplicate, // duplicate depending on the side. 
+		Delay; // set message aside and send after non-delay message is sent
+	}
+	public enum RuleOption {
+		Src, Dest, Kind, SeqNum, Duplicate;
+	}
+	
 	String configuration_filename;
 	String local_name;
 
@@ -42,7 +52,6 @@ public class MessagePasser {
 			this.port = port;
 		}
 	}
-	
     
 	public MessagePasser(String configuration_filename, String local_name){
     	this.configuration_filename = configuration_filename;
@@ -96,7 +105,7 @@ public class MessagePasser {
      * Check an outgoing message with the sending rules
      */
     public void checkSendRules(){
-    
+   
     }
     
     /**
@@ -105,6 +114,15 @@ public class MessagePasser {
     public void checkReceiveRules(){
     	
     }
+    
+    /**
+     * If the rule matches, apply the rule to the message
+     */
+    public void processRule(){
+        	
+    }
+    
+    
     
 
 }
