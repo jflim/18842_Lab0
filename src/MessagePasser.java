@@ -33,12 +33,10 @@ public class MessagePasser {
 	Map<String, Node> nodes;
 
 	// Send rule list
-	@SuppressWarnings("rawtypes")
-	ArrayList<LinkedHashMap> sendRules;
+	ArrayList<LinkedHashMap<String, Object>> sendRules;
 
 	// Receive rule list
-	@SuppressWarnings("rawtypes")
-	ArrayList<LinkedHashMap> receiveRules;
+	ArrayList<LinkedHashMap<String, Object>> receiveRules;
 
 	class Node {
 		String name;
@@ -70,13 +68,15 @@ public class MessagePasser {
 	 * 
 	 * @throws FileNotFoundException
 	 */
+	@SuppressWarnings("unchecked")
 	public void parseConfig() throws FileNotFoundException {
 		InputStream input = new FileInputStream(
 				new File(configuration_filename));
 		Yaml yaml = new Yaml();
 		Object data = yaml.load(input);
 
-		Map<String, ArrayList<LinkedHashMap>> m = (Map) data;
+		Map<String, ArrayList<LinkedHashMap<String, Object>>> m;
+		m = (Map<String, ArrayList<LinkedHashMap<String, Object>>>) data;
 		if (m.containsKey("configuration")) {
 			parseNodes(m.get("configuration"));
 		}
@@ -91,11 +91,10 @@ public class MessagePasser {
 	/**
 	 * Convert nodes from YAML format to Java objects and add nodes to a HashMap
 	 * 
-	 * @param nodeList
+	 * @param arrayList
 	 */
-	@SuppressWarnings("rawtypes")
-	public void parseNodes(ArrayList<LinkedHashMap> nodeList) {
-		for (LinkedHashMap node : nodeList) {
+	public void parseNodes(ArrayList<LinkedHashMap<String, Object>> arrayList) {
+		for (LinkedHashMap<String, Object> node : arrayList) {
 			String name = (String) node.get("name");
 			String ip = (String) node.get("ip");
 			int port = (int) node.get("port");
@@ -109,7 +108,7 @@ public class MessagePasser {
 	 * is applied to the message. Called by MessagePasser.send()
 	 */
 	public void checkSendRules(Message message) {
-		for (LinkedHashMap rule : sendRules) {		
+		for (LinkedHashMap<String, Object> rule : sendRules) {		
 			checkRule(message, rule);
 		}
 	}
@@ -120,7 +119,7 @@ public class MessagePasser {
 	 * is applied to the message.
 	 */
 	public void checkReceiveRules(Message message) {
-		for (LinkedHashMap rule : receiveRules) {		
+		for (LinkedHashMap<String, Object> rule : receiveRules) {		
 			checkRule(message, rule);
 		}
 	}
@@ -131,7 +130,7 @@ public class MessagePasser {
 	 * @param message
 	 * @param rule
 	 */
-	private void checkRule(Message message, LinkedHashMap rule) {
+	private void checkRule(Message message, LinkedHashMap<String, Object> rule) {
 		// check all the rule entries with message attributes
 
 		if (rule.containsKey("src") && 
