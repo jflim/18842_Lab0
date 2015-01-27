@@ -1,7 +1,5 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,6 +26,8 @@ public class MessagePasser {
 	/* class variables */
 	String configuration_filename;
 	String local_name;
+    private HashMap<String, Socket> sockets;
+    private HashMap<String, ObjectOutputStream> outputStreams;
 
 	// node configuration
 	Map<String, Node> nodes;
@@ -57,11 +57,11 @@ public class MessagePasser {
 		this.local_name = local_name;
 		nodes = new HashMap<String, Node>();
 
-       		 try {
-            		setup();
-        	} catch (Exception e) {
-            		e.printStackTrace();
-        	}
+       	try {
+            setUp();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 	/**
@@ -171,14 +171,49 @@ public class MessagePasser {
 
 	}
 
-    public void setup() throws Exception {
+    /**
+     * Setup server thread and client to send message
+     *
+     */
+    public void setUp() throws Exception {
 
-        ServerThread serverThread = new ServerThread(this, 12345);
+        ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port);
         new Thread(serverThread).start();
-        System.out.println("Server thread on");
+        System.out.println("Server thread on port " + nodes.get(local_name).port);
 
-        Client client = new Client();
-        client.send();
     }
 
+    /**
+     * Send message that matched the rule
+     *
+     */
+    public void sendMessage(Message message){
+        Socket clientSocket;
+        ObjectOutputStream output;
+        //If the connection has been established
+        if (sockets.get(message.dest) != null) {
+            clientSocket = sockets.get(message.dest);
+            output = outputStreams.get(message.dest);
+            try {
+                output.writeObject(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //else build the connection
+        else {
+            try {
+                clientSocket = new Socket(nodes.get(message.dest).ip,nodes.get(message.dest).port);
+                System.out.println("Connection setup with " + nodes.get(message.dest).ip + " port "+nodes.get(message.dest).port);
+                output = new ObjectOutputStream(clientSocket.getOutputStream());
+                output.writeObject(message);
+
+                sockets.put(message.dest, clientSocket);
+                outputStreams.put(message.dest, output);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
