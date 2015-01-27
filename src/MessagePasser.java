@@ -56,9 +56,12 @@ public class MessagePasser {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
 		nodes = new HashMap<String, Node>();
-		// ServerThread server = new ServerThread(this);
-		// new Thread(server).start();
 
+       		 try {
+            		setup();
+        	} catch (Exception e) {
+            		e.printStackTrace();
+        	}
 	}
 
 	/**
@@ -165,6 +168,17 @@ public class MessagePasser {
 	 */
 	public void processRule(String action, Message message) {
 
+
 	}
+
+    public void setup() throws Exception {
+
+        ServerThread serverThread = new ServerThread(this, 12345);
+        new Thread(serverThread).start();
+        System.out.println("Server thread on");
+
+        Client client = new Client();
+        client.send();
+    }
 
 }
