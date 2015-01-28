@@ -7,6 +7,8 @@ import java.util.Scanner;
  * Created by gs on 1/27/15.
  */
 public class ClientThread implements Runnable{
+
+
     private MessagePasser messagePasser;
     private int port;
 
@@ -40,6 +42,7 @@ public class ClientThread implements Runnable{
         		
         	}
         	else if(command.equalsIgnoreCase("exit")){
+                System.exit(0);
         		return;
         	}
         	else{

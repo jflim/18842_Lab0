@@ -8,11 +8,11 @@ public class Main {
 			err_usage();
 		}
 
-		String config_file = args[0];
-		String local_name = args[1];
+		String config_file = "config.yaml";
+		String local_name = "alice";
 
 		MessagePasser mp = new MessagePasser(config_file, local_name);
-		
+
 		// cl runs the main interactive process
 		ClientThread cl = new ClientThread(mp);
 		cl.run();

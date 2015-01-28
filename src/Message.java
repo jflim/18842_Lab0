@@ -18,14 +18,15 @@ public class Message implements Serializable {
 
 	// These setters are used by MessagePasser.send, not the app
 	public void set_source(String source) {
-
+        this.src = source;
 	}
 
 	public void set_seqNum(int sequenceNumber) {
-
+        this.seqNum = sequenceNumber;
 	}
 
 	public void set_duplicate(Boolean dup) {
+        this.dup = dup;
 	}
 	
 	// other accessors, toString, etc as needed

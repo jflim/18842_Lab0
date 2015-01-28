@@ -1,9 +1,6 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -26,8 +23,10 @@ public class MessagePasser {
 	/* class variables */
 	String configuration_filename;
 	String local_name;
+    int seqNum = 0;
     private HashMap<String, Socket> sockets;
     private HashMap<String, ObjectOutputStream> outputStreams;
+    private Queue<Message> delayQueue;
 
 	// node configuration
 	Map<String, Node> nodes;
@@ -152,6 +151,7 @@ public class MessagePasser {
 			return;
 		}
 		if (rule.containsKey("seqNum") && 
+
 				(((Integer) rule.get("seqNum")).equals(message.seqNum))) {
 			return;
 		}
@@ -162,6 +162,8 @@ public class MessagePasser {
 		}
 		
 		processRule((String) rule.get("action"), message);
+
+        return;
 	}
 
 
@@ -171,20 +173,59 @@ public class MessagePasser {
 	 * @param object 
 	 */
 	public void processRule(String action, Message message) {
+        if(action.equalsIgnoreCase("drop")){
+            return;
+        }
+        else if(action.equalsIgnoreCase("delay")){
+            this.delayQueue.add(message);
+        }
+        else if(action.equalsIgnoreCase("duplicate")){
+            sendMessage(message);
+            message.set_duplicate(true);
+        }
 
-
+        sendMessage(message);
+        while (!this.delayQueue.isEmpty()) {
+           sendMessage(delayQueue.remove());
+        }
 	}
+
+    /**
+     * Send message to other processes
+     * @param message
+     */
+    public void send(Message message){
+        message.set_source(local_name);
+        message.set_seqNum(seqNum);
+        message.set_duplicate(false);
+
+        checkSendRules(message);
+    }
 
     /**
      * Setup server thread and client to send message
      *
      */
     public void setUp() throws Exception {
-
+        Socket clientSocket;
+        ObjectOutputStream output;
         ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port);
         new Thread(serverThread).start();
         System.out.println("Server thread on port " + nodes.get(local_name).port);
+        //setup the connection
+        try {
+            for(String name: nodes.keySet()) {
+                clientSocket = new Socket(nodes.get(name).ip, nodes.get(name).port);
+                System.out.println("Connection setup with " + nodes.get(name).ip + " port " + nodes.get(name).port);
+                output = new ObjectOutputStream(clientSocket.getOutputStream());
 
+                sockets.put(name, clientSocket);
+                outputStreams.put(name, output);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
