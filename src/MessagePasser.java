@@ -102,7 +102,7 @@ public class MessagePasser {
 
 			String name = (String) node.get("name");
 			String ip = (String) node.get("ip");
-			int port = (int) node.get("port");
+			int port = (Integer) node.get("port");
 			Node n = new Node(name, ip, port);
 			nodes.put(name, n);	
 		}
@@ -152,7 +152,7 @@ public class MessagePasser {
 			return;
 		}
 		if (rule.containsKey("seqNum") && 
-				((int) rule.get("seqNum") == message.seqNum)) {
+				(((Integer) rule.get("seqNum")).equals(message.seqNum))) {
 			return;
 		}
 
