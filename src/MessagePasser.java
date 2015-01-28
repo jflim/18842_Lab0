@@ -55,7 +55,9 @@ public class MessagePasser {
 		this.local_name = local_name;
 		nodes = new HashMap<String, Node>();
 
+		
        	try {
+       		parseConfig();
             setUp();
         } catch (Exception e) {
             e.printStackTrace();

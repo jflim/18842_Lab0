@@ -13,13 +13,7 @@ public class Main {
 		String local_name = args[1];
 		
 		MessagePasser mp = new MessagePasser(config_file, local_name);
-		
-		try {
-			mp.parseConfig();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
+	
 	}
 
 	private static void err_usage() {
