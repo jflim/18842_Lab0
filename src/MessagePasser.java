@@ -53,8 +53,10 @@ public class MessagePasser {
 	public MessagePasser(String configuration_filename, String local_name) {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
+		
 		nodes = new HashMap<String, Node>();
-
+		sockets = new HashMap<String, Socket>();
+		outputStreams = new HashMap<String, ObjectOutputStream>();
 		
        	try {
        		parseConfig();
@@ -97,11 +99,12 @@ public class MessagePasser {
 	 */
 	public void parseNodes(ArrayList<LinkedHashMap<String, Object>> arrayList) {
 		for (LinkedHashMap<String, Object> node : arrayList) {
+
 			String name = (String) node.get("name");
 			String ip = (String) node.get("ip");
 			int port = (int) node.get("port");
 			Node n = new Node(name, ip, port);
-			nodes.put(name, n);
+			nodes.put(name, n);	
 		}
 	}
 
