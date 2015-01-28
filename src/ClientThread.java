@@ -42,6 +42,7 @@ public class ClientThread implements Runnable{
         		
         	}
         	else if(command.equalsIgnoreCase("exit")){
+                System.exit(0);
         		return;
         	}
         	else{

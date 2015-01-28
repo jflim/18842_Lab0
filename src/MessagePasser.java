@@ -1,9 +1,6 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -29,6 +26,7 @@ public class MessagePasser {
     int seqNum = 0;
     private HashMap<String, Socket> sockets;
     private HashMap<String, ObjectOutputStream> outputStreams;
+    private Queue<Message> delayQueue;
 
 	// node configuration
 	Map<String, Node> nodes;
@@ -103,7 +101,7 @@ public class MessagePasser {
 
 			String name = (String) node.get("name");
 			String ip = (String) node.get("ip");
-			int port = (int) node.get("port");
+			int port = (Integer) node.get("port");
 			Node n = new Node(name, ip, port);
 			nodes.put(name, n);	
 		}
@@ -153,7 +151,7 @@ public class MessagePasser {
 			return;
 		}
 		if (rule.containsKey("seqNum") && 
-				((int) rule.get("seqNum") == message.seqNum)) {
+				((Integer) rule.get("seqNum") == message.seqNum)) {
 			return;
 		}
 
@@ -163,6 +161,8 @@ public class MessagePasser {
 		}
 		
 		processRule((String) rule.get("action"), message);
+
+        return;
 	}
 
 
@@ -173,15 +173,20 @@ public class MessagePasser {
 	 */
 	public void processRule(String action, Message message) {
         if(action.equalsIgnoreCase("drop")){
-
+            return;
         }
         else if(action.equalsIgnoreCase("delay")){
-
+            this.delayQueue.add(message);
         }
         else if(action.equalsIgnoreCase("duplicate")){
-
+            sendMessage(message);
+            message.set_duplicate(true);
         }
 
+        sendMessage(message);
+        while (!this.delayQueue.isEmpty()) {
+           sendMessage(delayQueue.remove());
+        }
 	}
 
     /**
