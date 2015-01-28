@@ -24,7 +24,7 @@ public class ServerThread implements Runnable{
             Socket socket;
             while (true) {
                 socket = serverSocket.accept();
-                Thread thread = new Thread(new WorkThread(socket));
+                Thread thread = new Thread(new WorkThread(socket, messagePasser));
                 thread.start();
             }
 
