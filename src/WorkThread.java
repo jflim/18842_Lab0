@@ -21,9 +21,7 @@ public class WorkThread implements Runnable{
             input = new ObjectInputStream(socket.getInputStream());
             while(true) {
                 Message receivedMessage = (Message) input.readObject();
-
-
-
+                messagePasser.receiveMessage(receivedMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
