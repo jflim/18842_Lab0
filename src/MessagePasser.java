@@ -61,7 +61,10 @@ public class MessagePasser {
 		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
-
+		delayQueue = new LinkedList<Message>();
+		receivedDelayQueue = new LinkedList<Message>();
+		receivedQueue = new LinkedList<Message>();
+		
 		try {
 			parseConfig();
 			setUp();
@@ -114,7 +117,6 @@ public class MessagePasser {
 		if (m.containsKey("sendRules")) {
 			sendRules = m.get("sendRules");
 		}
-
 	}
 
 	/**
@@ -160,8 +162,15 @@ public class MessagePasser {
 	 */
 	public void checkSendRules(Message message) {
 		for (LinkedHashMap<String, Object> rule : sendRules) {
-			if (checkRule(message, rule))
+			if (checkRule(message, rule)){
 				processSendRule((String) rule.get("action"), message);
+			}
+			else{
+				sendMessage(message);
+				while (!this.delayQueue.isEmpty()) {
+					sendMessage(delayQueue.remove());
+				}
+			}
 
 		}
 	}
@@ -179,10 +188,12 @@ public class MessagePasser {
 	}
 
 	/**
-	 * Checks if a rule matches, and calls another function to apply the rule.
-	 *
+	 * Checks if a rule matches, and calls another function to apply the rule
+	 * if it is.
 	 * @param message
 	 * @param rule
+	 * @return true  if a rule matches
+	 * 		   false if a rule doesn't match
 	 */
 	private boolean checkRule(Message message,
 			LinkedHashMap<String, Object> rule) {
@@ -201,9 +212,8 @@ public class MessagePasser {
 				&& !((String) rule.get("kind")).equalsIgnoreCase(message.kind)) {
 			return false;
 		}
-		if (rule.containsKey("seqNum") &&
-
-		(((Integer) rule.get("seqNum")).equals(message.seqNum))) {
+		if (rule.containsKey("seqNum") 
+				&& (((Integer) rule.get("seqNum")).equals(message.seqNum))) {
 			return false;
 		}
 
@@ -256,6 +266,7 @@ public class MessagePasser {
 		}
 
 		this.receivedQueue.add(message);
+		System.out.println("Received something");
 		while (!this.receivedDelayQueue.isEmpty()) {
 			this.receivedQueue.add(this.receivedDelayQueue.remove());
 		}
@@ -292,6 +303,7 @@ public class MessagePasser {
 	 * @param message
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
+		System.out.println("receiveMessage being called");
 		getReceiveRules();
 		checkReceiveRules(message);
 	}
@@ -301,9 +313,14 @@ public class MessagePasser {
 	 */
 	public void setUp() throws Exception {
 
+		// start up the listening socket
+		ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port);
+        new Thread(serverThread).start();
+        System.out.println("Server thread on port " + nodes.get(local_name).port);
+
+		// set up connections to the nodes ordered before local in config file.
 		List<String> nodeList = new ArrayList<String>(nodes.keySet());
 		System.out.println(nodeList);
-		// set up connections to the nodes ordered before local in config file.
 		int local_index = nodeList.indexOf(local_name);
 		List<String> targetList = nodeList.subList(0, local_index);
 
@@ -357,24 +374,9 @@ public class MessagePasser {
 				e.printStackTrace();
 			}
 		}
-		// else build the connection
-		else {
-			try {
-				clientSocket = new Socket(nodes.get(message.dest).ip,
-						nodes.get(message.dest).port);
-				System.out.println("Connection setup with "
-						+ nodes.get(message.dest).ip + " port "
-						+ nodes.get(message.dest).port);
-				output = new ObjectOutputStream(clientSocket.getOutputStream());
-				output.writeObject(message);
-
-				sockets.put(message.dest, clientSocket);
-				outputStreams.put(message.dest, output);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
+	}
+	
+	public void addSockets(String remote_host, Socket remote_socket){
+		sockets.put(remote_host, remote_socket);
 	}
 }
