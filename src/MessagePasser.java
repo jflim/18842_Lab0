@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.*;
 
@@ -10,6 +11,7 @@ import org.yaml.snakeyaml.Yaml;
 
 public class MessagePasser {
 
+	
 	public enum ActionType {
 		Drop, // any message will be ignored/dropped
 		Duplicate, // duplicate depending on the side.
@@ -23,6 +25,7 @@ public class MessagePasser {
 	/* class variables */
 	String configuration_filename;
 	String local_name;
+	public static final int TIMEOUT_IN_SECS = 3;
     int seqNum = 0;
     private HashMap<String, Socket> sockets;
     private HashMap<String, ObjectOutputStream> outputStreams;
@@ -53,7 +56,7 @@ public class MessagePasser {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
 		
-		nodes = new HashMap<String, Node>();
+		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
 		
@@ -213,20 +216,47 @@ public class MessagePasser {
         new Thread(serverThread).start();
         System.out.println("Server thread on port " + nodes.get(local_name).port);
         //setup the connection
-        try {
-            for(String name: nodes.keySet()) {
-                clientSocket = new Socket(nodes.get(name).ip, nodes.get(name).port);
-                System.out.println("Connection setup with " + nodes.get(name).ip + " port " + nodes.get(name).port);
-                output = new ObjectOutputStream(clientSocket.getOutputStream());
+        
+        
+        List<String> nodeList = new ArrayList<String>(nodes.keySet());
+        System.out.println(nodeList);
+        // set up connections to the nodes ordered before local in config file.
+        int local_index = nodeList.indexOf(local_name);
+        List<String> targetList =  nodeList.subList(0, local_index);
+        
+        System.out.println(targetList);
+		while (!targetList.isEmpty()) {
+			
+			// try to make a connection with remote "server"
+			// no delay at the moment if fail.
+			for (Iterator<String> iter = targetList.iterator(); iter.hasNext();) {
+				String targetName = iter.next();
+				String targetIp = nodes.get(targetName).ip;
+				int targetPort = nodes.get(targetName).port;
+				int timeout = TIMEOUT_IN_SECS * 1000; //sec to msec
 
-                sockets.put(name, clientSocket);
-                outputStreams.put(name, output);
-            }
+				try {
+					clientSocket = new Socket();
+					clientSocket.connect(new InetSocketAddress(targetIp,
+							targetPort), timeout);
+					System.out.println("Connection setup with " + targetIp
+							+ " port " + targetPort);
+					output = new ObjectOutputStream(
+							clientSocket.getOutputStream());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+					sockets.put(targetName, clientSocket);
+					outputStreams.put(targetName, output);
+					iter.remove();
+
+				} catch (IOException e) {
+					//e.printStackTrace();
+					System.err.println("Unable to set up connection with "
+							+ nodes.get(targetName).ip + " port "
+							+ nodes.get(targetName).port);
+				}
+			}
+		}
+	}
 
     /**
      * Send message that matched the rule
