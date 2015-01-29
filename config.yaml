@@ -9,12 +9,12 @@
 configuration :
    - name : p1
      ip : 128.237.172.190
-     port : 12345 # This is the incoming port on which MP will listen
+     port : 12340 # This is the incoming port on which MP will listen
                   # May be changed for further communication as usual
 
    - name : p2
      ip : 128.237.172.190
-     port : 12346
+     port : 12341
 
    - name : charlie
      ip : 128.2.130.19

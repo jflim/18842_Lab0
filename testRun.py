@@ -7,7 +7,7 @@ import os
 import time
 
 config = "config.yaml"
-local_name = "p2"
+local_name = "p1"
 
 command="/Library/Java/JavaVirtualMachines/jdk1.7.0_75.jdk/Contents/Home/bin/java -Dfile.encoding=UTF-8 -classpath /Users/flimth/CMU/18842/Lab0/bin:/Users/flimth/CMU/18842/Lab0/lib/snakeyaml-1.14.jar Main "
 
