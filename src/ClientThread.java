@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -38,13 +39,23 @@ public class ClientThread implements Runnable{
         		System.out.println("Content: ");
         		String content = scan.nextLine();
         		Message m = new Message(target, kind, content);
-        		messagePasser.sendMessage(m);
-        		
-        	}
+                try {
+                    messagePasser.send(m);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
         	else if(command.equalsIgnoreCase("exit")){
                 System.exit(0);
         		return;
         	}
+            else if(command.equalsIgnoreCase("receive")){
+                Message message = this.messagePasser.receive();
+                System.out.println("Received Message: " +message.data + " kind: " + message.kind + " src: " +
+                        message.src + " id: " + message.seqNum + " duplicate: " + message.dup);
+                return;
+            }
         	else{
         		print_error("Enter your command: send [kind] [target_node]");
         		continue;
