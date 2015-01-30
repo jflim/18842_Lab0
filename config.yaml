@@ -17,45 +17,33 @@ configuration :
      port : 12341
 
    - name : p3
-     ip : 127.0.0.1
+     ip : 128.237.217.4
      port : 12342
 
    - name : p4
-     ip : 127.0.0.1
+     ip : 128.237.217.4
      port : 12343
 
 sendRules :
    - action : drop # Ack message number 4 from bob to alice will not be sent
-     src : p1
-     dest : p2
-     kind : Ack
-     seqNum : 4
+     kind : sendDrop
 
    - action : delay # Every Lookup message in the system will be delayed
-     kind : Lookup
+     kind : sendDelay
 
-   - action : duplicate
-     seqNum : 2
-
-   - action : drop # 3rd message from Charlie that anyone
-     src : p1 # receives will be duplicated
-     duplicate: true
+   - action : duplicate # Every Lookup message in the system will be delayed
+     kind : sendDuplicate
 
 receiveRules :
-   - action : duplicate # 3rd message from Charlie that anyone
-     src : p1 # receives will be duplicated
-
    - action : drop # Ack message number 4 from bob to alice will not be sent
-     src : p1
-     dest : p2
-     kind : aaa
+     kind : rcvDrop
 
-   - action : drop # Ack message number 4 from bob to alice will not be sent
-     src : p1
-     dest : p2
-     duplicate: true
+   - action : delay # Every Lookup message in the system will be delayed
+     kind : rcvDelay
 
-   - action : delay # Ack message number 4 from bob to alice will not be sent
-     src : p1
-     dest : p2
-     kind : delay
+   - action : duplicate # Every Lookup message in the system will be delayed
+     kind : rcvDuplicate
+
+   - action : drop # Every Lookup message in the system will be delayed
+     kind : sendDuplicate
+     duplicate : true
