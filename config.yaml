@@ -25,11 +25,9 @@ configuration :
      port : 12343
 
 sendRules :
-   - action : drop # Ack message number 4 from bob to alice will not be sent
+   - action : duplicate # Ack message number 4 from bob to alice will not be sent
      src : p1
      dest : p2
-     kind : Ack
-     seqNum : 4
 
    - action : delay # Every Lookup message in the system will be delayed
      kind : Lookup
@@ -42,8 +40,9 @@ sendRules :
      duplicate: true
 
 receiveRules :
-   - action : duplicate # 3rd message from Charlie that anyone
+   - action : drop # 3rd message from Charlie that anyone
      src : p1 # receives will be duplicated
+     duplicate: true
 
    - action : drop # Ack message number 4 from bob to alice will not be sent
      src : p1

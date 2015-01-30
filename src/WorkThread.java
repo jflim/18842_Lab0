@@ -23,20 +23,22 @@ public class WorkThread implements Runnable{
             input = new ObjectInputStream(socket.getInputStream());
             while(true) {
                 Message receivedMessage = (Message) input.readObject();
+
+        		System.out.println("in run wortkthread " + receivedMessage.data + " " + receivedMessage.dup);
                 if(!messagePasser.getSockets().containsKey(receivedMessage.src)){
                 	messagePasser.addSockets(receivedMessage.src, socket);
                     messagePasser.addStream(receivedMessage.src, new ObjectOutputStream(socket.getOutputStream()));
                 }
                 messagePasser.receiveMessage(receivedMessage);
 
-                Message processedMessage = this.messagePasser.receive();
-                if(processedMessage != null)
-                    System.out.println("Data: " + processedMessage.data + " SeqNum: " + processedMessage.seqNum
-                            +" Duplicate: " + processedMessage.dup);
-                processedMessage = this.messagePasser.receive();
-                if(processedMessage != null)
-                    System.out.println("Data: " + processedMessage.data + " SeqNum: " + processedMessage.seqNum
-                            +" Duplicate: " + processedMessage.dup);
+                // actually return the message content.
+				Message processedMessage = this.messagePasser.receive();
+				while (processedMessage != null) {
+					System.out.println("Data: " + processedMessage.data
+							+ " SeqNum: " + processedMessage.seqNum
+							+ " Duplicate: " + processedMessage.dup);
+					processedMessage = this.messagePasser.receive();
+				}
             }
         } catch (IOException e) {
             e.printStackTrace();
