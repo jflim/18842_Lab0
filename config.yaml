@@ -8,12 +8,12 @@
 
 configuration :
    - name : p1
-     ip : 127.0.0.1
+     ip :
      port : 12340 # This is the incoming port on which MP will listen
                   # May be changed for further communication as usual
 
    - name : p2
-     ip : 127.0.0.1
+     ip :
      port : 12341
 
    - name : p3
@@ -25,25 +25,25 @@ configuration :
      port : 12343
 
 sendRules :
-   - action : drop # Ack message number 4 from bob to alice will not be sent
+   - action : drop
      kind : sendDrop
 
-   - action : delay # Every Lookup message in the system will be delayed
+   - action : delay
      kind : sendDelay
 
-   - action : duplicate # Every Lookup message in the system will be delayed
+   - action : duplicate
      kind : sendDuplicate
 
 receiveRules :
-   - action : drop # Ack message number 4 from bob to alice will not be sent
+   - action : drop
      kind : rcvDrop
 
-   - action : delay # Every Lookup message in the system will be delayed
+   - action : delay 
      kind : rcvDelay
 
-   - action : duplicate # Every Lookup message in the system will be delayed
+   - action : duplicate
      kind : rcvDuplicate
 
-   - action : drop # Every Lookup message in the system will be delayed
+   - action : drop
      kind : sendDuplicate
      duplicate : true
