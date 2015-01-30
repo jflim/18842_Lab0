@@ -27,8 +27,15 @@ public class WorkThread implements Runnable{
                     messagePasser.addStream(receivedMessage.src, new ObjectOutputStream(socket.getOutputStream()));
                 }
                 messagePasser.receiveMessage(receivedMessage);
+
                 Message processedMessage = this.messagePasser.receive();
-                System.out.println(processedMessage.data);
+                if(processedMessage != null)
+                    System.out.println("Data: " + processedMessage.data + " SeqNum: " + processedMessage.seqNum
+                            +" Duplicate: " + processedMessage.dup);
+                processedMessage = this.messagePasser.receive();
+                if(processedMessage != null)
+                    System.out.println("Data: " + processedMessage.data + " SeqNum: " + processedMessage.seqNum
+                            +" Duplicate: " + processedMessage.dup);
             }
         } catch (IOException e) {
             e.printStackTrace();
