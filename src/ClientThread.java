@@ -62,6 +62,7 @@ public class ClientThread implements Runnable{
      * @param string
      */
 	private void usage() {
+		System.out.println("Usage:");
 		System.out.println("send [kind] [target node]");
 		System.out.println("help -display this help message");
 		System.out.println("exit -exit the program");

@@ -7,6 +7,7 @@ import os
 import time
 
 config = "config.yaml"
+
 if len(sys.argv) != 2:
    print "Usage: ./testrun.py [local_name]"
    sys.exit(1)

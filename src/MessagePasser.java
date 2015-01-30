@@ -353,10 +353,11 @@ public class MessagePasser {
 					iter.remove();
 
 				} catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 					System.err.println("Unable to set up connection with "
 							+ nodes.get(targetName).ip + " port "
 							+ nodes.get(targetName).port);
+					Thread.sleep(TIMEOUT_IN_SECS * 1000);
 				}
 			}
 		}
