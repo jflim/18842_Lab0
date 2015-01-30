@@ -32,7 +32,7 @@ public class MessagePasser {
 	private Queue<Message> delayQueue;
 	private Queue<Message> receivedDelayQueue;
 	private Queue<Message> receivedQueue;
-
+    private boolean isProcessedRules = false;
 	// node configuration
 	Map<String, Node> nodes;
 
@@ -154,38 +154,45 @@ public class MessagePasser {
 	 * Check an outgoing message with the sending rules. First rule that matches
 	 * is applied to the message. Called by MessagePasser.send()
 	 */
-	public void checkSendRules(Message message) {
+	public synchronized void checkSendRules(Message message) {
+        isProcessedRules = false;
+        System.out.println("Send: " + message.data + " to " + message.dest +" Seqnum: " +message.seqNum);
 		for (LinkedHashMap<String, Object> rule : sendRules) {
 			if (checkRule(message, rule)){
 				processSendRule((String) rule.get("action"), message);
+                isProcessedRules = true;
 				break;
 			}
 		}
-		
-		sendMessage(message);
-		while (!this.delayQueue.isEmpty()) {
-			sendMessage(delayQueue.remove());
-		}		
+		if(isProcessedRules != true) {
+            sendMessage(message);
+            while (!this.delayQueue.isEmpty()) {
+                sendMessage(delayQueue.remove());
+            }
+        }
 	}
 
 	/**
 	 * Check an incoming message with the receive rules. First rule that matches
 	 * is applied to the message.
 	 */
-	public void checkReceiveRules(Message message) {
-
+	public synchronized void checkReceiveRules(Message message) {
+        isProcessedRules = false;
 		for (LinkedHashMap<String, Object> rule : receiveRules) {
 			
 			if (checkRule(message, rule)) { // if rule matched
 				processReceiveRule((String) rule.get("action"), message);
+                isProcessedRules = true;
 				break;
 			}
 		}
+        if(isProcessedRules != true) {
+            receivedQueue.add(message);
+            while (!this.receivedDelayQueue.isEmpty()) {
+                this.receivedQueue.add(this.receivedDelayQueue.remove());
+            }
 
-		receivedQueue.add(message);
-		while (!this.receivedDelayQueue.isEmpty()) {
-			this.receivedQueue.add(this.receivedDelayQueue.remove());
-		}
+        }
 	}
 
 	/**
@@ -214,12 +221,12 @@ public class MessagePasser {
 			return false;
 		}
 		if (rule.containsKey("seqNum") 
-				&& (((Integer) rule.get("seqNum")).equals(message.seqNum))) {
+				&& !(((Integer) rule.get("seqNum")).equals(message.seqNum))) {
 			return false;
 		}
 
 		if (rule.containsKey("duplicate")
-				&& (rule.get("duplicate") == message.dup)) {
+				&& !(rule.get("duplicate") == message.dup)) {
 			return false;
 		}
 
@@ -233,15 +240,23 @@ public class MessagePasser {
 	 * @param object
 	 */
 	public synchronized void processSendRule(String action, Message message) {
+
 		if (action.equalsIgnoreCase("drop")) {
-			return;
+            System.out.println("Drop");
+            message = null;
+            return;
 		} else if (action.equalsIgnoreCase("delay")) {
+            System.out.println("Delay");
 			this.delayQueue.add(message);
+            message = null;
+            return;
 		} else if (action.equalsIgnoreCase("duplicate")) {
+            System.out.println("Duplicate");
 			sendMessage(message);
+
 			message.set_duplicate(true);
-		   // sendMessage(message);
-		    
+		    sendMessage(message);
+		    System.out.println("Duplicate: " + message.dup);
 			//sent a non-delayed message. send any delayed messages
 			while (!this.delayQueue.isEmpty()) {
 				sendMessage(delayQueue.remove());
@@ -257,14 +272,17 @@ public class MessagePasser {
 	 */
 	public synchronized void processReceiveRule(String action, Message message) {
 		if (action.equals("drop")) {
+            message = null;
 			return;
 		} else if (action.equals("delay")) { // 1 delayed message
 			this.receivedDelayQueue.add(message);
+            message = null;
+            return;
 		} else if (action.equals("duplicate")) { // 2 messages
 			Message duplicateMessage = new Message(message);
+            this.receivedQueue.add(message);
 			duplicateMessage.set_duplicate(true);
 			this.receivedQueue.add(duplicateMessage);
-			
 			while (!this.receivedDelayQueue.isEmpty()) {
 				this.receivedQueue.add(this.receivedDelayQueue.remove());				
 			}
@@ -279,7 +297,7 @@ public class MessagePasser {
 
 	public void send(Message message) throws FileNotFoundException {
 		message.set_source(local_name);
-		message.set_seqNum(seqNum);
+		message.set_seqNum(seqNum++);
 		message.set_duplicate(false);
 		getSendRules();
 		checkSendRules(message);
@@ -291,7 +309,7 @@ public class MessagePasser {
 	 * @param message
 	 */
 	public Message receive() {
-		Message message = this.receivedQueue.remove();
+		Message message = this.receivedQueue.poll();
 		return message;
 	}
 
@@ -301,9 +319,12 @@ public class MessagePasser {
 	 * @param message
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
-		getReceiveRules();
-		checkReceiveRules(message);
-		
+
+		//System.out.println("Received something, but need to check rules.");
+        if(message != null) {
+            getReceiveRules();
+            checkReceiveRules(message);
+        }
 	}
 
 	/**
@@ -318,7 +339,7 @@ public class MessagePasser {
 
 		// set up connections to the nodes ordered before local in config file.
 		List<String> nodeList = new ArrayList<String>(nodes.keySet());
-		System.out.println(nodeList);
+		//System.out.println(nodeList);
 		int local_index = nodeList.indexOf(local_name);
 		List<String> targetList = nodeList.subList(0, local_index);
 
