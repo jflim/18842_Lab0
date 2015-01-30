@@ -8,12 +8,12 @@
 
 configuration :
    - name : p1
-     ip :
+     ip : 128.237.172.67
      port : 12340 # This is the incoming port on which MP will listen
                   # May be changed for further communication as usual
 
    - name : p2
-     ip :
+     ip : 128.237.172.67
      port : 12341
 
    - name : p3

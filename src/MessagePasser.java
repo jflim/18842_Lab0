@@ -311,7 +311,7 @@ public class MessagePasser {
 	 */
 	public Message receive() {
 		Message message = this.receivedQueue.poll();
-		return message;
+		return message;z
 	}
 
 	/**
