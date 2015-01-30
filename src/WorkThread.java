@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -23,6 +24,7 @@ public class WorkThread implements Runnable{
                 Message receivedMessage = (Message) input.readObject();
                 if(!messagePasser.getSockets().containsKey(receivedMessage.src)){
                 	messagePasser.addSockets(receivedMessage.src, socket);
+                    messagePasser.addStream(receivedMessage.src, new ObjectOutputStream(socket.getOutputStream()));
                 }
                 messagePasser.receiveMessage(receivedMessage);
                 Message processedMessage = this.messagePasser.receive();

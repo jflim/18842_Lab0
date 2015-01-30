@@ -245,7 +245,7 @@ public class MessagePasser {
 		} else if (action.equalsIgnoreCase("duplicate")) {
 			sendMessage(message);
 			message.set_duplicate(true);
-		    sendMessage(message);
+		   // sendMessage(message);
 		    
 			//sent a non-delayed message. send any delayed messages
 			while (!this.delayQueue.isEmpty()) {
@@ -376,7 +376,7 @@ public class MessagePasser {
 		if (sockets.get(message.dest) != null) {
 			clientSocket = sockets.get(message.dest);
 			output = outputStreams.get(message.dest);
-			try {
+            try {
 				output.writeObject(message);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -392,7 +392,10 @@ public class MessagePasser {
 	public void addSockets(String remote_host, Socket remote_socket){
 		sockets.put(remote_host, remote_socket);
 	}
-	
+
+    public void addStream(String remote_host, ObjectOutputStream stream){
+        outputStreams.put(remote_host, stream);
+    }
 	/**
 	 * get the list of known target sockets
 	 * @return
