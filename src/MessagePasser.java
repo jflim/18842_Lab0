@@ -240,7 +240,6 @@ public class MessagePasser {
 	 */
 	public synchronized void processSendRule(String action, Message message) {
 
-		//System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
 		if (action.equalsIgnoreCase("drop")) {
             System.out.println("Drop");
             message = null;
@@ -271,7 +270,6 @@ public class MessagePasser {
 	 * @param object
 	 */
 	public synchronized void processReceiveRule(String action, Message message) {
-		//System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
 		if (action.equals("drop")) {
             System.out.println("Drop");
             message = null;
@@ -322,9 +320,7 @@ public class MessagePasser {
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
 
-		//System.out.println("Received something, but need to check rules.");
-		//System.out.println(message.data + " " + message.dup);
-        if(message != null) {
+	    if(message != null) {
             getReceiveRules();
             checkReceiveRules(message);
         }
@@ -392,7 +388,6 @@ public class MessagePasser {
 	 */
 	public void sendMessage(Message message) {
 
-		//System.out.println("|| " + message.data + " " + message.dup);
 		Socket clientSocket;
 		ObjectOutputStream output;
 		// If the connection has been established

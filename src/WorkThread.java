@@ -24,8 +24,7 @@ public class WorkThread implements Runnable{
             while(true) {
                 Message receivedMessage = (Message) input.readObject();
 
-        		System.out.println("in run wortkthread " + receivedMessage.data + " " + receivedMessage.dup);
-                if(!messagePasser.getSockets().containsKey(receivedMessage.src)){
+        		if(!messagePasser.getSockets().containsKey(receivedMessage.src)){
                 	messagePasser.addSockets(receivedMessage.src, socket);
                     messagePasser.addStream(receivedMessage.src, new ObjectOutputStream(socket.getOutputStream()));
                 }
