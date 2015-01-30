@@ -225,7 +225,7 @@ public class MessagePasser {
 		}
 
 		if (rule.containsKey("duplicate")
-				&& (rule.get("duplicate") != message.dup)) {
+				&& !(rule.get("duplicate").equals(message.dup))) {
 			return false;
 		}
 
@@ -273,6 +273,7 @@ public class MessagePasser {
 	public synchronized void processReceiveRule(String action, Message message) {
 		//System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
 		if (action.equals("drop")) {
+            System.out.println("Drop");
             message = null;
 			return;
 		} else if (action.equals("delay")) { // 1 delayed message
@@ -311,7 +312,7 @@ public class MessagePasser {
 	 */
 	public Message receive() {
 		Message message = this.receivedQueue.poll();
-		return message;z
+		return message;
 	}
 
 	/**
