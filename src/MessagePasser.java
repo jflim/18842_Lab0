@@ -191,7 +191,6 @@ public class MessagePasser {
             while (!this.receivedDelayQueue.isEmpty()) {
                 this.receivedQueue.add(this.receivedDelayQueue.remove());
             }
-
         }
 	}
 
@@ -226,7 +225,7 @@ public class MessagePasser {
 		}
 
 		if (rule.containsKey("duplicate")
-				&& !(rule.get("duplicate") == message.dup)) {
+				&& (rule.get("duplicate") != message.dup)) {
 			return false;
 		}
 
@@ -241,6 +240,7 @@ public class MessagePasser {
 	 */
 	public synchronized void processSendRule(String action, Message message) {
 
+		System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
 		if (action.equalsIgnoreCase("drop")) {
             System.out.println("Drop");
             message = null;
@@ -253,10 +253,10 @@ public class MessagePasser {
 		} else if (action.equalsIgnoreCase("duplicate")) {
             System.out.println("Duplicate");
 			sendMessage(message);
-
-			message.set_duplicate(true);
-		    sendMessage(message);
-		    System.out.println("Duplicate: " + message.dup);
+			Message m = new Message(message);
+			m.set_duplicate(true);
+		    sendMessage(m);
+		     
 			//sent a non-delayed message. send any delayed messages
 			while (!this.delayQueue.isEmpty()) {
 				sendMessage(delayQueue.remove());
@@ -271,6 +271,7 @@ public class MessagePasser {
 	 * @param object
 	 */
 	public synchronized void processReceiveRule(String action, Message message) {
+		System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
 		if (action.equals("drop")) {
             message = null;
 			return;
@@ -320,7 +321,8 @@ public class MessagePasser {
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
 
-		//System.out.println("Received something, but need to check rules.");
+		System.out.println("Received something, but need to check rules.");
+		System.out.println(message.data + " " + message.dup);
         if(message != null) {
             getReceiveRules();
             checkReceiveRules(message);
@@ -388,6 +390,8 @@ public class MessagePasser {
 	 * Send message that matched the rule
 	 */
 	public void sendMessage(Message message) {
+
+		System.out.println("|| " + message.data + " " + message.dup);
 		Socket clientSocket;
 		ObjectOutputStream output;
 		// If the connection has been established
