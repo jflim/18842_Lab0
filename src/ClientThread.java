@@ -24,7 +24,7 @@ public class ClientThread implements Runnable{
     	Scanner scan = new Scanner(System.in);
     	
         while(true){
-        	System.out.println("Enter your command: send [kind] [target_node]");
+        	usage();
         	String line = scan.nextLine();
         	String[] tmpline = line.split("\\s+"); 
         	
@@ -32,12 +32,11 @@ public class ClientThread implements Runnable{
 
         	if(command.equalsIgnoreCase("send")){
         		if(tmpline.length != 3){
-            		print_error("Enter your command: send [kind] [target_node]");
             		continue;
             	}
             	String kind = tmpline[1];
             	String target = tmpline[2];
-        		System.out.println("Content: ");
+        		System.out.println("Enter the message content: ");
         		String content = scan.nextLine();
         		Message m = new Message(target, kind, content);
                 try {
@@ -45,23 +44,16 @@ public class ClientThread implements Runnable{
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-
             }
         	else if(command.equalsIgnoreCase("exit")){
                 System.exit(0);
         		return;
         	}
-            /*else if(command.equalsIgnoreCase("receive")){
-                Message message = this.messagePasser.receive();
-                System.out.println("Received Message: " +message.data + " kind: " + message.kind + " src: " +
-                        message.src + " id: " + message.seqNum + " duplicate: " + message.dup);
-                return;
-            }*/
-        	else{
-        		print_error("Enter your command: send [kind] [target_node]");
-        		continue;
+        	
+        	else if(command.equalsIgnoreCase("help")){
+        		usage();
         	}
-        	System.out.println(command);
+        	
         }
     }
 
@@ -69,7 +61,9 @@ public class ClientThread implements Runnable{
      * Error printing function
      * @param string
      */
-	private void print_error(String string) {
-		System.err.println(string);
+	private void usage() {
+		System.out.println("send [kind] [target node]");
+		System.out.println("help -display this help message");
+		System.out.println("exit -exit the program");
 	}
 }

@@ -91,12 +91,6 @@ public class MessagePasser {
 		if (m.containsKey("configuration")) {
 			parseNodes(m.get("configuration"));
 		}
-		// if (m.containsKey("sendRules")) {
-		// sendRules = m.get("sendRules");
-		// }
-		// if (m.containsKey("receiveRules")) {
-		// receiveRules = m.get("receiveRules");
-		// }
 	}
 
 	/**
@@ -307,7 +301,6 @@ public class MessagePasser {
 	 * @param message
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
-		System.out.println("Received something, but need to check rules.");
 		getReceiveRules();
 		checkReceiveRules(message);
 		
