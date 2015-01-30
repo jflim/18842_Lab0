@@ -7,7 +7,11 @@ import os
 import time
 
 config = "config.yaml"
-local_name = "p1"
+if len(sys.argv) != 2:
+   print "Usage: ./testrun.py [local_name]"
+   sys.exit(1)
+
+local_name = sys.argv[1]
 
 command="/Library/Java/JavaVirtualMachines/jdk1.7.0_75.jdk/Contents/Home/bin/java -Dfile.encoding=UTF-8 -classpath /Users/flimth/CMU/18842/Lab0/bin:/Users/flimth/CMU/18842/Lab0/lib/snakeyaml-1.14.jar Main "
 
