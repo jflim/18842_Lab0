@@ -164,15 +164,14 @@ public class MessagePasser {
 		for (LinkedHashMap<String, Object> rule : sendRules) {
 			if (checkRule(message, rule)){
 				processSendRule((String) rule.get("action"), message);
+				break;
 			}
-			else{
-				sendMessage(message);
-				while (!this.delayQueue.isEmpty()) {
-					sendMessage(delayQueue.remove());
-				}
-			}
-
 		}
+		
+		sendMessage(message);
+		while (!this.delayQueue.isEmpty()) {
+			sendMessage(delayQueue.remove());
+		}		
 	}
 
 	/**
@@ -181,9 +180,16 @@ public class MessagePasser {
 	 */
 	public void checkReceiveRules(Message message) {
 		for (LinkedHashMap<String, Object> rule : receiveRules) {
-			if (checkRule(message, rule))
+			
+			if (checkRule(message, rule)) { // if rule matched
 				processReceiveRule((String) rule.get("action"), message);
+				break;
+			}
+		}
 
+		receivedQueue.add(message);
+		while (!this.receivedDelayQueue.isEmpty()) {
+			this.receivedQueue.add(this.receivedDelayQueue.remove());
 		}
 	}
 
@@ -239,12 +245,13 @@ public class MessagePasser {
 		} else if (action.equalsIgnoreCase("duplicate")) {
 			sendMessage(message);
 			message.set_duplicate(true);
-		}
-
-		sendMessage(message);
-		while (!this.delayQueue.isEmpty()) {
-			sendMessage(delayQueue.remove());
-		}
+		    sendMessage(message);
+		    
+			//sent a non-delayed message. send any delayed messages
+			while (!this.delayQueue.isEmpty()) {
+				sendMessage(delayQueue.remove());
+			}
+		}	
 	}
 
 	/**
@@ -256,21 +263,17 @@ public class MessagePasser {
 	public synchronized void processReceiveRule(String action, Message message) {
 		if (action.equals("drop")) {
 			return;
-		} else if (action.equals("delay")) {
+		} else if (action.equals("delay")) { // 1 delayed message
 			this.receivedDelayQueue.add(message);
-		} else if (action.equals("duplicate")) {
+		} else if (action.equals("duplicate")) { // 2 messages
 			Message duplicateMessage = new Message(message);
 			duplicateMessage.set_duplicate(true);
 			this.receivedQueue.add(duplicateMessage);
-
+			
+			while (!this.receivedDelayQueue.isEmpty()) {
+				this.receivedQueue.add(this.receivedDelayQueue.remove());				
+			}
 		}
-
-		this.receivedQueue.add(message);
-		System.out.println("Received something");
-		while (!this.receivedDelayQueue.isEmpty()) {
-			this.receivedQueue.add(this.receivedDelayQueue.remove());
-		}
-
 	}
 
 	/**
@@ -303,9 +306,10 @@ public class MessagePasser {
 	 * @param message
 	 */
 	public void receiveMessage(Message message) throws FileNotFoundException {
-		System.out.println("receiveMessage being called");
+		System.out.println("Received something, but need to check rules.");
 		getReceiveRules();
 		checkReceiveRules(message);
+		
 	}
 
 	/**
@@ -346,6 +350,10 @@ public class MessagePasser {
 
 					sockets.put(targetName, clientSocket);
 					outputStreams.put(targetName, output);
+				  	
+					// initial HELLO request
+			    	Message initialM = new Message(targetName, "HELLO", "HELLO");
+			    	send(initialM);	    	
 					iter.remove();
 
 				} catch (IOException e) {
@@ -376,7 +384,20 @@ public class MessagePasser {
 		}
 	}
 	
+	/**
+	 * add a socket to the list of sockets
+	 * @param remote_host
+	 * @param remote_socket
+	 */
 	public void addSockets(String remote_host, Socket remote_socket){
 		sockets.put(remote_host, remote_socket);
+	}
+	
+	/**
+	 * get the list of known target sockets
+	 * @return
+	 */
+	public HashMap<String, Socket> getSockets(){
+		return sockets;
 	}
 }

@@ -23,7 +23,6 @@ public class ServerThread implements Runnable{
             Socket socket;
             while (true) {
                 socket = serverSocket.accept();
-                messagePasser.addSockets(remote_host, socket);
                 Thread thread = new Thread(new WorkThread(socket, messagePasser));
                 thread.start();
             }

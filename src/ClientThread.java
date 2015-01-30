@@ -22,6 +22,7 @@ public class ClientThread implements Runnable{
     public void run()
     {
     	Scanner scan = new Scanner(System.in);
+    	
         while(true){
         	System.out.println("Enter your command: send [kind] [target_node]");
         	String line = scan.nextLine();
@@ -50,12 +51,12 @@ public class ClientThread implements Runnable{
                 System.exit(0);
         		return;
         	}
-            else if(command.equalsIgnoreCase("receive")){
+            /*else if(command.equalsIgnoreCase("receive")){
                 Message message = this.messagePasser.receive();
                 System.out.println("Received Message: " +message.data + " kind: " + message.kind + " src: " +
                         message.src + " id: " + message.seqNum + " duplicate: " + message.dup);
                 return;
-            }
+            }*/
         	else{
         		print_error("Enter your command: send [kind] [target_node]");
         		continue;
