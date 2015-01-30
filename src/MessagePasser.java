@@ -179,6 +179,7 @@ public class MessagePasser {
 	 * is applied to the message.
 	 */
 	public void checkReceiveRules(Message message) {
+
 		for (LinkedHashMap<String, Object> rule : receiveRules) {
 			
 			if (checkRule(message, rule)) { // if rule matched
@@ -343,6 +344,8 @@ public class MessagePasser {
 					Socket clientSocket = new Socket();
 					clientSocket.connect(new InetSocketAddress(targetIp,
 							targetPort), timeout);
+                    Thread thread = new Thread(new WorkThread(clientSocket, this));
+                    thread.start();
 					System.out.println("Connection setup with " + targetIp
 							+ " port " + targetPort);
 					ObjectOutputStream output = new ObjectOutputStream(
