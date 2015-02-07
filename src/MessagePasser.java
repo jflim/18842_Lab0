@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -29,6 +30,8 @@ public class MessagePasser {
 	int seqNum = 0;
 	private HashMap<String, Socket> sockets;
 	private HashMap<String, ObjectOutputStream> outputStreams;
+	private HashMap<ObjectInputStream, ObjectOutputStream> connectStreams;
+	
 	private Queue<Message> delayQueue;
 	private Queue<Message> receivedDelayQueue;
 	private Queue<Message> receivedQueue;
@@ -61,13 +64,15 @@ public class MessagePasser {
 		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
+		connectStreams = new HashMap<ObjectInputStream, ObjectOutputStream>();
+		
 		delayQueue = new LinkedList<Message>();
 		receivedDelayQueue = new LinkedList<Message>();
 		receivedQueue = new LinkedList<Message>();
 		
 		try {
 			parseConfig();
-			setUp();
+			serverSetUp();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -155,6 +160,14 @@ public class MessagePasser {
 	 * is applied to the message. Called by MessagePasser.send()
 	 */
 	public synchronized void checkSendRules(Message message) {
+        // there are no receive rules
+        if(sendRules == null || sendRules.isEmpty()){
+            sendMessage(message);
+            while (!this.delayQueue.isEmpty()) {
+                sendMessage(delayQueue.remove());
+            }
+            return;
+        }
         isProcessedRules = false;
         System.out.println("Send: " + message.data + " to " + message.dest +" Seqnum: " +message.seqNum);
 		for (LinkedHashMap<String, Object> rule : sendRules) {
@@ -178,14 +191,27 @@ public class MessagePasser {
 	 */
 	public synchronized void checkReceiveRules(Message message) {
         isProcessedRules = false;
+        
+        // there are no receive rules
+        if(receiveRules == null || receiveRules.isEmpty()){
+            receivedQueue.add(message);
+            while (!this.receivedDelayQueue.isEmpty()) {
+                this.receivedQueue.add(this.receivedDelayQueue.remove());
+            }
+            return;
+        }
+        
+        // check if any rules match
 		for (LinkedHashMap<String, Object> rule : receiveRules) {
-			
+			System.out.println(receiveRules);
 			if (checkRule(message, rule)) { // if rule matched
 				processReceiveRule((String) rule.get("action"), message);
                 isProcessedRules = true;
 				break;
 			}
 		}
+		
+		// no rules match
         if(isProcessedRules != true) {
             receivedQueue.add(message);
             while (!this.receivedDelayQueue.isEmpty()) {
@@ -290,7 +316,7 @@ public class MessagePasser {
 	}
 
 	/**
-	 * Send message to other processes
+	 * Request to send message to other processes
 	 * 
 	 * @param message
 	 */
@@ -308,88 +334,65 @@ public class MessagePasser {
 	 *
 	 * @param message
 	 */
-	public Message receive() {
+	public Message receiveMessage() {
 		Message message = this.receivedQueue.poll();
 		return message;
 	}
 
 	/**
-	 * Receive message from other processes
+	 * Request to receive message from other processes
+	 * @param socket 
 	 *
 	 * @param message
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public void receiveMessage(Message message) throws FileNotFoundException {
+	public void receive(Socket socket, ObjectInputStream input) throws ClassNotFoundException, IOException {
+		Message receivedMessage = (Message) input.readObject();
+		// may throw IO exception.
 
-	    if(message != null) {
+        //add the socket and stream of the sender.
+		if(!sockets.containsKey(receivedMessage.src)){
+        	this.addSockets(receivedMessage.src, socket);
+        	ObjectOutputStream output;
+			try {
+				output = new ObjectOutputStream(socket.getOutputStream());
+	            this.addOutputStream(receivedMessage.src, output);
+	            this.addConnectionStreams(input, output);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+        }
+		
+	    if(receivedMessage != null) {
             getReceiveRules();
-            checkReceiveRules(message);
+            checkReceiveRules(receivedMessage);
         }
 	}
 
 	/**
 	 * Setup server thread and client to send message
 	 */
-	public void setUp() throws Exception {
+	public void serverSetUp() throws Exception {
 
 		// start up the listening socket
 		ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port);
         new Thread(serverThread).start();
         System.out.println("Server thread on port " + nodes.get(local_name).port);
 
-		// set up connections to the nodes ordered before local in config file.
-		List<String> nodeList = new ArrayList<String>(nodes.keySet());
-		//System.out.println(nodeList);
-		int local_index = nodeList.indexOf(local_name);
-		List<String> targetList = nodeList.subList(0, local_index);
-
-		System.out.println(targetList);
-		while (!targetList.isEmpty()) {
-
-			// try to make a connection with remote "server"
-			// no delay at the moment if fail.
-			for (Iterator<String> iter = targetList.iterator(); iter.hasNext();) {
-				String targetName = iter.next();
-				String targetIp = nodes.get(targetName).ip;
-				int targetPort = nodes.get(targetName).port;
-				int timeout = TIMEOUT_IN_SECS * 1000; // sec to msec
-
-				try {
-					Socket clientSocket = new Socket();
-					clientSocket.connect(new InetSocketAddress(targetIp,
-							targetPort), timeout);
-                    Thread thread = new Thread(new WorkThread(clientSocket, this));
-                    thread.start();
-					System.out.println("Connection setup with " + targetIp
-							+ " port " + targetPort);
-					ObjectOutputStream output = new ObjectOutputStream(
-							clientSocket.getOutputStream());
-
-					sockets.put(targetName, clientSocket);
-					outputStreams.put(targetName, output);
-				  	
-					// initial HELLO request
-			    	Message initialM = new Message(targetName, "HELLO", "HELLO");
-			    	send(initialM);	    	
-					iter.remove();
-
-				} catch (IOException e) {
-					//e.printStackTrace();
-					System.err.println("Unable to set up connection with "
-							+ nodes.get(targetName).ip + " port "
-							+ nodes.get(targetName).port);
-					Thread.sleep(TIMEOUT_IN_SECS * 1000);
-				}
-			}
-		}
 	}
 
 	/**
 	 * Send message that matched the rule
+	 * through use of streams
 	 */
 	public void sendMessage(Message message) {
 
-		Socket clientSocket;
-		ObjectOutputStream output;
+		Socket clientSocket = null;
+		ObjectOutputStream output = null;
+		
 		// If the connection has been established
 		if (sockets.get(message.dest) != null) {
 			clientSocket = sockets.get(message.dest);
@@ -397,11 +400,74 @@ public class MessagePasser {
             try {
 				output.writeObject(message);
 			} catch (IOException e) {
-				e.printStackTrace();
+				// assume the connection is dead.
+				System.err.println("Connection refused. Check the receiving side.");
+				this.removeSocket(message.dest);
+				return;
+			}
+		}
+		else{
+			//set up a new connection 
+			String targetName = message.dest;
+			String targetIp = nodes.get(targetName).ip;
+			int targetPort = nodes.get(targetName).port;
+			int timeout = TIMEOUT_IN_SECS * 1000; // sec to msec
+
+			boolean connected = false;
+			while(connected == false){
+				try {
+					clientSocket = new Socket();
+					clientSocket.connect(new InetSocketAddress(targetIp,
+							targetPort), timeout);
+					System.out.println("Connected to " + targetIp + " port "
+							+ targetPort);
+					
+					connected = true;
+				}
+				catch (IOException e) {
+					System.err.println("Unable to set up connection with "
+							+ nodes.get(targetName).ip + " port "
+							+ nodes.get(targetName).port);
+					
+					// wait a while before attempt to connect again.
+					try {
+						Thread.sleep(timeout);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+					continue;
+				}
+				
+				Thread thread = new Thread(new WorkThread(clientSocket, this));
+				thread.start();
+				
+				try {
+					output = new ObjectOutputStream(clientSocket.getOutputStream());
+					output.writeObject(message);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				sockets.put(targetName, clientSocket);
+				outputStreams.put(targetName, output);
 			}
 		}
 	}
 	
+	/**
+	 * removes output streams from saved streams.
+	 * usually called when send fails.
+	 * @param dest
+	 */
+	private void removeOutputStream(String dest) {
+		Iterator<String> x = outputStreams.keySet().iterator();
+		while(x.hasNext()){
+			if(x.equals(dest)){
+				x.remove();
+			}
+		}
+	}
+
 	/**
 	 * add a socket to the list of sockets
 	 * @param remote_host
@@ -411,14 +477,62 @@ public class MessagePasser {
 		sockets.put(remote_host, remote_socket);
 	}
 
-    public void addStream(String remote_host, ObjectOutputStream stream){
+    public void addOutputStream(String remote_host, ObjectOutputStream stream){
         outputStreams.put(remote_host, stream);
     }
+    
+    public void addConnectionStreams(ObjectInputStream in, ObjectOutputStream out){
+    	connectStreams.put(in, out);
+    }
+    
 	/**
 	 * get the list of known target sockets
 	 * @return
 	 */
 	public HashMap<String, Socket> getSockets(){
 		return sockets;
+	}
+
+	/**
+	 * removes stream from saved output streams ;usually called to remove
+	 * streams that are destroyed (i.e. received a SIG INT)
+	 */
+	public String removeInputStream(ObjectInputStream input) {
+		Iterator<Entry<ObjectInputStream, ObjectOutputStream>> streamIter = connectStreams
+				.entrySet().iterator();
+		while (streamIter.hasNext()) {
+			Entry<ObjectInputStream, ObjectOutputStream> x = streamIter.next();
+			if (x.getKey().equals(input)) {
+
+				// find the outputStream
+				Iterator<Entry<String, ObjectOutputStream>> oIter = outputStreams
+						.entrySet().iterator();
+				while (oIter.hasNext()) {
+					Entry<String, ObjectOutputStream> entry = oIter.next();
+					if (entry.getValue().equals(x.getValue())) {
+						String targetName = entry.getKey();
+						streamIter.remove();
+						oIter.remove();
+						System.out.println("removed the Streams");
+						return targetName;
+					}
+				}
+			}
+		}
+
+		// stream not found in the hashmap
+		return null;
+
+	}
+
+	public void removeSocket(String targetName) {
+		Iterator<String> socketIter = sockets.keySet().iterator();
+		while (socketIter.hasNext()) {
+			String socketName = socketIter.next();
+			if (socketName.equals(targetName)) {
+				socketIter.remove();
+				System.out.println("removed the socket");
+			}
+		}
 	}
 }

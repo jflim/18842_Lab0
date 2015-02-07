@@ -16,34 +16,36 @@ public class WorkThread implements Runnable{
         this.messagePasser = messagePasser;
     }
 
-    @Override
-    public void run() {
-        ObjectInputStream input = null;
-        try {
-            input = new ObjectInputStream(socket.getInputStream());
-            while(true) {
-                Message receivedMessage = (Message) input.readObject();
+	@Override
+	public void run() {
+		ObjectInputStream input = null;
+		try {
+			input = new ObjectInputStream(socket.getInputStream());
+			while (true) {
 
-        		if(!messagePasser.getSockets().containsKey(receivedMessage.src)){
-                	messagePasser.addSockets(receivedMessage.src, socket);
-                    messagePasser.addStream(receivedMessage.src, new ObjectOutputStream(socket.getOutputStream()));
-                }
-                messagePasser.receiveMessage(receivedMessage);
+				messagePasser.receive(socket, input);
 
-                // actually return the message content.
-				Message processedMessage = this.messagePasser.receive();
+				// actually return the message content.
+				Message processedMessage = this.messagePasser.receiveMessage();
 				while (processedMessage != null) {
 					System.out.println("Data: " + processedMessage.data
 							+ " SeqNum: " + processedMessage.seqNum
 							+ " Duplicate: " + processedMessage.dup);
-					processedMessage = this.messagePasser.receive();
+					processedMessage = this.messagePasser.receiveMessage();
 				}
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+			}
+		} catch (IOException e) {
+
+			try {
+				input.close();
+				String socketName = messagePasser.removeInputStream(input);
+				messagePasser.removeSocket(socketName);
+				return;
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 }
