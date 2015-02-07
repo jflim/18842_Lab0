@@ -1,3 +1,5 @@
+import Clock.ClockService;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -26,8 +28,8 @@ public class ClientThread implements Runnable{
         while(true){
         	usage();
         	String line = scan.nextLine();
-        	String[] tmpline = line.split("\\s+"); 
-        	
+        	String[] tmpline = line.split("\\s+");
+            ClockService clock;
         	String command = tmpline[0];
 
         	if(command.equalsIgnoreCase("send")){

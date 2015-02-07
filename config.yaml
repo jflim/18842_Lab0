@@ -8,20 +8,20 @@
 
 configuration :
    - name : p1
-     ip : 128.237.172.67
+     ip : 128.237.171.66
      port : 12340 # This is the incoming port on which MP will listen
                   # May be changed for further communication as usual
 
    - name : p2
-     ip : 128.237.172.67
+     ip : 128.237.171.66
      port : 12341
 
    - name : p3
-     ip : 128.237.217.4
+     ip : 128.237.216.131
      port : 12342
 
    - name : p4
-     ip : 128.237.217.4
+     ip : 128.237.216.131
      port : 12343
 
 sendRules :

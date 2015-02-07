@@ -3,6 +3,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.*;
 
+import Clock.ClockService;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -33,6 +34,7 @@ public class MessagePasser {
 	private Queue<Message> receivedDelayQueue;
 	private Queue<Message> receivedQueue;
     private boolean isProcessedRules = false;
+    private ClockService clock = null;
 	// node configuration
 	Map<String, Node> nodes;
 
@@ -42,7 +44,7 @@ public class MessagePasser {
 	// Receive rule list
 	ArrayList<LinkedHashMap<String, Object>> receiveRules;
 
-	class Node {
+	public class Node {
 		String name;
 		String ip;
 		int port;
@@ -67,6 +69,7 @@ public class MessagePasser {
 		
 		try {
 			parseConfig();
+            setClock();
 			setUp();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,7 +95,16 @@ public class MessagePasser {
 			parseNodes(m.get("configuration"));
 		}
 	}
+    /**
+     * set global clock
+     *
+     * @throws FileNotFoundException
+     */
 
+    public void setClock(){
+        if(this.clock == null)
+            clock = ClockService.newClock(true, local_name);
+    }
 	/**
 	 * parse the configuration file and store the sendRules
 	 *
@@ -141,7 +153,6 @@ public class MessagePasser {
 	 */
 	public void parseNodes(ArrayList<LinkedHashMap<String, Object>> arrayList) {
 		for (LinkedHashMap<String, Object> node : arrayList) {
-
 			String name = (String) node.get("name");
 			String ip = (String) node.get("ip");
 			int port = (Integer) node.get("port");
@@ -236,7 +247,6 @@ public class MessagePasser {
 	 * Apply the rule to the sent message if matched.
 	 *
 	 * @param message
-	 * @param object
 	 */
 	public synchronized void processSendRule(String action, Message message) {
 
@@ -268,7 +278,6 @@ public class MessagePasser {
 	 * Apply the rule to the received message if matched.
 	 *
 	 * @param message
-	 * @param object
 	 */
 	public synchronized void processReceiveRule(String action, Message message) {
 		//System.out.println("Action: " + action + "|| " + message.data + " " + message.dup);
@@ -301,14 +310,16 @@ public class MessagePasser {
 		message.set_source(local_name);
 		message.set_seqNum(seqNum++);
 		message.set_duplicate(false);
+        this.clock.clockIncrement();
+        // Add TimeStamp to Message
+        TimeStampedMessage timeStampedMessage = new TimeStampedMessage(message, this.clock.copy());
 		getSendRules();
-		checkSendRules(message);
+		checkSendRules(timeStampedMessage);
 	}
 
 	/**
 	 * Receive message from other processes
 	 *
-	 * @param message
 	 */
 	public Message receive() {
 		Message message = this.receivedQueue.poll();
