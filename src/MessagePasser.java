@@ -197,7 +197,7 @@ public class MessagePasser {
             return;
         }
         isProcessedRules = false;
-        System.out.println("Send: " + message.data + " to " + message.dest +" Seqnum: " +message.seqNum);
+        System.out.println("Send: " + message.data + " to " + message.dest +" Seqnum: " +message.seqNum + " Timestamp: " + message.getTimeStamp());
 		for (LinkedHashMap<String, Object> rule : sendRules) {
 			if (checkRule(message, rule)){
 				processSendRule((String) rule.get("action"), message);

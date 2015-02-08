@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * Created by gs on 1/26/15.
@@ -21,6 +22,7 @@ public class WorkThread implements Runnable{
 		ObjectInputStream input = null;
 		try {
 			input = new ObjectInputStream(socket.getInputStream());
+            Scanner scan = new Scanner(System.in);
 			while (true) {
 
 				messagePasser.receive(socket, input);
@@ -30,9 +32,15 @@ public class WorkThread implements Runnable{
 				while (processedMessage != null) {
 					System.out.println("Data: " + processedMessage.data
 							+ " SeqNum: " + processedMessage.seqNum
-							+ " Duplicate: " + processedMessage.dup);
-					processedMessage = this.messagePasser.receiveMessage();
+							+ " Duplicate: " + processedMessage.dup + " Timestamp: " + processedMessage.getTimeStamp());
+                    System.out.println("Do you want to log this message? Y: N");
+
+                    String line = scan.nextLine();
+                    if(line.equalsIgnoreCase("Y"))
+
                     messagePasser.getClock().setClock(processedMessage.getTimeStamp());
+					processedMessage = this.messagePasser.receiveMessage();
+
 				}
 			}
 		} catch (IOException e) {
