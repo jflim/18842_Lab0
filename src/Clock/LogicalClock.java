@@ -27,5 +27,12 @@ public class LogicalClock extends ClockService{
         clock.counter = this.counter;
         return clock;
     }
-
+    public int compareTo(ClockService clock) {
+        LogicalClock otherClock = (LogicalClock)clock;
+        if (this.counter < otherClock.counter)
+            return -1;
+        if (this.counter > otherClock.counter)
+            return 1;
+        return 0;
+    }
 }

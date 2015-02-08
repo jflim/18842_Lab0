@@ -22,4 +22,5 @@ public abstract class ClockService {
     public abstract void setClock(ClockService receivedClock);
     public abstract Object getClock();
     public abstract ClockService copy();
+    public abstract int compareTo(ClockService clock);
 }

@@ -54,18 +54,18 @@ public class VectorClock extends ClockService{
 	 *  1 : this clock is larger
 	 *  2 : concurrent clocks
 	 */
-	public int compareTo(VectorClock other){
+	public int compareTo(ClockService other){
 		int index;
 		
 		int initialthis  = this.getClockValue(0);
-		int initialother = other.getClockValue(0);
+		int initialother = ((VectorClock) other).getClockValue(0);
 		
 		// set initial values
 		int status = compare(initialthis, initialother);
 		
 		for(index = 1; index < size; index++){
 			int a = this.getClockValue(index);
-			int b = other.getClockValue(index);
+			int b = ((VectorClock)other).getClockValue(index);
 			
 			int nextStatus = compare(a,b);
 			if(nextStatus == 0){
