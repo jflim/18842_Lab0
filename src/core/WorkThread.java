@@ -13,9 +13,17 @@ import java.util.Scanner;
 public class WorkThread implements Runnable{
     private Socket socket;
     private MessagePasser messagePasser;
+	
+    // logger variables
+    private boolean isLogger;
+    List<TimeStampedMessage> logs;
+    
+	
     public WorkThread(Socket socket, MessagePasser messagePasser, boolean isLogger, List<TimeStampedMessage> logs){
         this.socket = socket;
         this.messagePasser = messagePasser;
+        this.isLogger = isLogger;
+        this.logs = logs;
     }
 
 	@Override
@@ -31,18 +39,30 @@ public class WorkThread implements Runnable{
 				// actually return the message content.
 				TimeStampedMessage processedMessage = this.messagePasser.receiveMessage();
 				while (processedMessage != null) {
-					System.out.println("Data: " + processedMessage.data
-							+ " SeqNum: " + processedMessage.seqNum
-							+ " Duplicate: " + processedMessage.dup + " Timestamp: " + processedMessage.getTimeStamp());
-                    //log message
-                    System.out.println("Do you want to log this message? Y: N");
-                    String line = scan.nextLine();
-                    if(line.equalsIgnoreCase("Y")){
-                        processedMessage.set_dst("logger");
-                        messagePasser.send(processedMessage);
-                    }
-                    //ajust clock
-                    messagePasser.getClock().setClock(processedMessage.getTimeStamp());
+					
+					// adjust clock
+					messagePasser.getClock().setClock(
+							processedMessage.getTimeStamp());
+					
+					if(isLogger){
+						logs.add(processedMessage);
+					}
+ 
+					else {
+						System.out.println("Data: " + processedMessage.data
+								+ " SeqNum: " + processedMessage.seqNum
+								+ " Duplicate: " + processedMessage.dup
+								+ " Timestamp: "
+								+ processedMessage.getTimeStamp());
+						
+						// log message
+						System.out.println("Do you want to log this message? Y: N");
+						String line = scan.nextLine();
+						if (line.equalsIgnoreCase("Y")) {
+							sendMessageToLogger(processedMessage);
+						}
+
+					}
 					processedMessage = this.messagePasser.receiveMessage();
 
 				}
@@ -60,5 +80,10 @@ public class WorkThread implements Runnable{
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void sendMessageToLogger(TimeStampedMessage processedMessage) {
+		messagePasser.sendMessageToLogger(processedMessage);
+		
 	}
 }

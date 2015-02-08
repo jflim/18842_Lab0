@@ -35,6 +35,9 @@ public class Logger {
 			if (input.equals("print log")) {
 				displayLog();
 			}
+			else{
+				System.out.println("Usage: print log");
+			}
 		}
 
 	}

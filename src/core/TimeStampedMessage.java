@@ -6,6 +6,7 @@ import java.io.Serializable;
 /**
  * Created by gs on 2/6/15.
  */
+@SuppressWarnings("serial")
 public class TimeStampedMessage extends Message implements Serializable{
 
     String src;

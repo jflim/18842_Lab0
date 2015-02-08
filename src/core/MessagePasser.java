@@ -417,7 +417,16 @@ public class MessagePasser {
      * through use of streams
      */
     public void sendMessage(TimeStampedMessage message) {
+    	sendMessage(message, false);
+    }
 
+
+	private void sendMessage(TimeStampedMessage message, boolean toLogger) {
+		String targetName = message.dest;
+    	if(toLogger == true){
+    		targetName = "Logger";
+    	}
+    	
         Socket clientSocket = null;
         ObjectOutputStream output = null;
 
@@ -435,7 +444,6 @@ public class MessagePasser {
             }
         } else {
             //set up a new connection
-            String targetName = message.dest;
             String targetIp = nodes.get(targetName).ip;
             int targetPort = nodes.get(targetName).port;
             int timeout = TIMEOUT_IN_SECS * 1000; // sec to msec
@@ -478,7 +486,7 @@ public class MessagePasser {
                 outputStreams.put(targetName, output);
             }
         }
-    }
+	}
 
     /**
      * removes output streams from saved streams.
@@ -568,4 +576,10 @@ public class MessagePasser {
     public ClockService getClock() {
         return this.clock;
     }
+
+
+	public void sendMessageToLogger(TimeStampedMessage processedMessage) {
+		boolean toLogger = true;
+    	sendMessage(processedMessage, toLogger);	
+	}
 }

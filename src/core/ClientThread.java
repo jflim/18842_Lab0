@@ -35,25 +35,26 @@ public class ClientThread implements Runnable{
         	if(command.equalsIgnoreCase("send")){
         		if(tmpline.length != 3){
             		continue;
-            	}
-            	String kind = tmpline[1];
-            	String target = tmpline[2];
-        		System.out.println("Enter the message content: ");
-        		String content = scan.nextLine();
-        		TimeStampedMessage m = new TimeStampedMessage(target, kind, content, messagePasser.getClock());
-                try {
-                    m.set_source(messagePasser.local_name);
-                    m.set_seqNum(messagePasser.seqNum++);
-                    messagePasser.send(m);
+				}
+				String kind = tmpline[1];
+				String target = tmpline[2];
+				System.out.println("Enter the message content: ");
+				String content = scan.nextLine();
+				TimeStampedMessage m = new TimeStampedMessage(target, kind,
+						content, messagePasser.getClock());
+				try {
+					m.set_source(messagePasser.local_name);
+					m.set_seqNum(messagePasser.seqNum++);
+					messagePasser.send(m);
 
-                    System.out.println("Do you want to log this message? Y: N");//log message
-                    line = scan.nextLine();
-                    if(line.equalsIgnoreCase("Y")){
-                        m.set_dst("logger");
-                        messagePasser.send(m);
-                    }
+					System.out.println("Do you want to log this message? Y: N");// log
+																				// message
+					line = scan.nextLine();
+					if (line.equalsIgnoreCase("Y")) {
+						messagePasser.sendMessageToLogger(m);
+					}
 
-                    messagePasser.getClock().clockIncrement(); //clock increment
+					messagePasser.getClock().clockIncrement(); //clock increment
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
