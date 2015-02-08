@@ -13,24 +13,30 @@ public class TimeStampedMessage extends Message implements Serializable{
     int seqNum;
     Boolean dup;
     Object data; //content of the message
-    private ClockService clock;
+    private ClockService timeStamp;
 
-    public TimeStampedMessage(String dest, String kind, Object data, ClockService clock) {
+    public TimeStampedMessage(String dest, String kind, Object data, ClockService timeStamp) {
         super(dest, kind, data);
-        this.clock = clock;
+        this.timeStamp = timeStamp;
 //        this.dest = dest;
 //        this.kind = kind;
 //        this.dup = false; //default value
 //        this.data = data;
     }
-    public TimeStampedMessage(Message message, ClockService clock) {
+    public TimeStampedMessage(TimeStampedMessage message) {
         super(message);
-        this.clock = clock;
+        this.timeStamp = message.timeStamp;
 //        this.dest = message.dest;
 //        this.kind = message.kind;
 //        this.dup = message.dup; //default value
 //        this.data = message.data;
 //        this.seqNum = message.seqNum;
+    }
+
+    public TimeStampedMessage(Message message, ClockService timeStamp) {
+        super(message);
+        this.timeStamp = timeStamp;
+
     }
     // These setters are used by MessagePasser.send, not the app
     public void set_source(String source) {
@@ -45,4 +51,7 @@ public class TimeStampedMessage extends Message implements Serializable{
         this.dup = dup;
     }
 
+    public ClockService getTimeStamp(){
+        return this.timeStamp;
+    }
 }
