@@ -1,3 +1,4 @@
+package core;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -48,6 +49,10 @@ public class MessagePasser {
 
     // Receive rule list
     ArrayList<LinkedHashMap<String, Object>> receiveRules;
+	
+    // logger variables
+    private boolean isLogger;
+	private List<TimeStampedMessage> logs;
 
     public class Node {
         String name;
@@ -61,7 +66,7 @@ public class MessagePasser {
         }
     }
 
-    public MessagePasser(String configuration_filename, String local_name) {
+    public MessagePasser(String configuration_filename, String local_name, boolean isLogger, List<TimeStampedMessage> logs) {
         this.configuration_filename = configuration_filename;
         this.local_name = local_name;
 
@@ -395,7 +400,7 @@ public class MessagePasser {
     public void serverSetUp() throws Exception {
 
         // start up the listening socket
-        ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port);
+        ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port, isLogger, logs);
         new Thread(serverThread).start();
         System.out.println("Server thread on port " + nodes.get(local_name).port);
 
@@ -453,7 +458,7 @@ public class MessagePasser {
                     continue;
                 }
 
-                Thread thread = new Thread(new WorkThread(clientSocket, this));
+                Thread thread = new Thread(new WorkThread(clientSocket, this, false, null));
                 thread.start();
 
                 try {

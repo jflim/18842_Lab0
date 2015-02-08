@@ -1,6 +1,6 @@
-import java.io.FileNotFoundException;
+package core;
 
-public class Main {
+public class Main{
 
 	public static void main(String[] args) {
 
@@ -11,7 +11,7 @@ public class Main {
 		String config_file = args[0];
 		String local_name = args[1];
 
-		MessagePasser mp = new MessagePasser(config_file, local_name);
+		MessagePasser mp = new MessagePasser(config_file, local_name, false, null);
 
 		// cl runs the main interactive process
 		ClientThread cl = new ClientThread(mp);

@@ -1,8 +1,10 @@
+package core;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Scanner;
 public class WorkThread implements Runnable{
     private Socket socket;
     private MessagePasser messagePasser;
-    public WorkThread(Socket socket, MessagePasser messagePasser){
+    public WorkThread(Socket socket, MessagePasser messagePasser, boolean isLogger, List<TimeStampedMessage> logs){
         this.socket = socket;
         this.messagePasser = messagePasser;
     }

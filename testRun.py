@@ -6,7 +6,7 @@ import sys
 import os
 import time
 
-config = "config.yaml"
+config = "/Users/flimth/Dropbox/18842/config.yaml"
 
 if len(sys.argv) != 2:
    print "Usage: ./testrun.py [local_name]"

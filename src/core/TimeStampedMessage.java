@@ -1,3 +1,4 @@
+package core;
 import Clock.ClockService;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ public class TimeStampedMessage extends Message implements Serializable{
     String dest;
     String kind;
     int seqNum;
-    Boolean dup;
+    boolean dup;
     Object data; //content of the message
     private ClockService timeStamp;
 
@@ -54,4 +55,18 @@ public class TimeStampedMessage extends Message implements Serializable{
     public ClockService getTimeStamp(){
         return this.timeStamp;
     }
+    
+    /* getters    */
+    
+	public String getData() {
+		return (String) this.data;
+	}
+	
+	public int getSeqNum() {
+		return this.seqNum;
+	}
+	public boolean getDup() {
+		return this.dup;
+	}
+	
 }
