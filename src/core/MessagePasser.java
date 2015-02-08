@@ -89,7 +89,8 @@ public class MessagePasser {
         }
     }
 
-    /**
+
+	/**
      * parse the configuration file and store the elements into local Java data
      * structures.
      *
@@ -104,24 +105,29 @@ public class MessagePasser {
 
         Map<String, ArrayList<LinkedHashMap<String, Object>>> m;
         m = (Map<String, ArrayList<LinkedHashMap<String, Object>>>) data;
+		
+        // collect nodes in the configuration
         if (m.containsKey("configuration")) {
-            parseNodes(m.get("configuration"));
-        } else if (this.clock == null && m.containsKey("clock")) {
-            ArrayList<LinkedHashMap<String, Object>> clockRule = m.get("clock");
-            String clockType = (String) clockRule.get(0).get("Logical");
-            // determine local_index according to node hashmap
-            int local_index = 0;
-            Iterator<String> x = nodes.keySet().iterator();
-            while (x.hasNext()) {
-                String nodeName = x.next();
-                if (nodeName.equals(local_name)) {
-                    break;
-                }
-                local_index++;
-            }
-            clock = ClockService.newClock(clockType, local_index, nodes.size());
-
-        }
+			parseNodes(m.get("configuration"));
+		}
+		
+        // set up the clock
+		if (this.clock == null && m.containsKey("clock")) {
+			ArrayList<LinkedHashMap<String, Object>> clockRule = m.get("clock");
+			boolean isLogical = (boolean) clockRule.get(0).get("Logical");
+			
+			// determine local_index according to node hashmap
+			int local_index = 0;
+			Iterator<String> x = nodes.keySet().iterator();
+			while (x.hasNext()) {
+				String nodeName = x.next();
+				if (nodeName.equals(local_name)) {
+					break;
+				}
+				local_index++;
+			}
+			clock = ClockService.newClock(isLogical, local_index, nodes.size());
+		}
     }
 
     /**
