@@ -7,31 +7,43 @@ public class VectorClock extends ClockService{
 
 	private int counters[]; //the timestamp
 	private int size;
+	private int selfIndex;
 	
-    public VectorClock(int size){
+    public VectorClock(int selfIndex, int size){
 		counters = new int[size];
 		this.size = size;
+		this.selfIndex = selfIndex;
     }
 
     @Override
     public void clockIncrement() {
-    	
+    	counters[selfIndex]++;
     }
 
     @Override
-    public void setClock(ClockService receivedClock) {
+	public void setClock(ClockService receivedClock) {
+		int index;
+		for (index = 0; index < size; index++) {
+			this.counters[index] = Math.max(counters[index],
+					((VectorClock) receivedClock).counters[index]);
+		}
+		this.counters[selfIndex]++; // receiver adds 1
+	}
 
+    public void setIndex(int index){
+    	this.selfIndex = index;
     }
-
-	public int getClockValue(int index) {
+    
+	private int getClockValue(int index) {
 		return counters[index];
 	}
 
 	@Override
 	public ClockService copy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        VectorClock clock = new VectorClock(selfIndex, size);
+        clock.counters = this.counters;
+        return clock;
+    }
 	
 	/**
 	 * Compares two VectorClock instances
@@ -65,10 +77,8 @@ public class VectorClock extends ClockService{
 			else if(nextStatus != status){ //concurrent
 				return 2;
 			}
-			
 		}
-		return status;
-		
+		return status;	
 	}
 	
 	private int compare(int a, int b){
@@ -85,6 +95,6 @@ public class VectorClock extends ClockService{
 
 	@Override
 	public Object getClock() {
-		return null;
+		return counters;
 	}
 }
