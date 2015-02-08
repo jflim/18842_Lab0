@@ -6,13 +6,13 @@ import java.util.Map;
  */
 public abstract class ClockService {
     private static ClockService clock = null;
-    public static ClockService newClock(boolean isLogicalClock, String hostName){
+    public static ClockService newClock(boolean isLogicalClock, String hostName, int size){
 
         if(isLogicalClock){
             clock = new LogicalClock();
         }
         else{
-            clock = new VectorClock();
+            clock = new VectorClock(size);
         }
 
         return clock;

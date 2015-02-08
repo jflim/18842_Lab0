@@ -111,7 +111,7 @@ public class MessagePasser {
 
     public void setClock(){
         if(this.clock == null)
-            clock = ClockService.newClock(true, local_name);
+            clock = ClockService.newClock(true, local_name, nodes.size());
     }
 	/**
 	 * parse the configuration file and store the sendRules
