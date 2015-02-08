@@ -1,7 +1,13 @@
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by gs on 2/7/15.
  */
 public class Logger {
+    List<TimeStampedMessage> logs = new LinkedList<TimeStampedMessage>();
+
+
     public static void main(String[] args) {
 
         if (args.length != 2) {
@@ -10,11 +16,11 @@ public class Logger {
 
         String config_file = args[0];
         String local_name = args[1];
-
-        MessagePasser mp = new MessagePasser(config_file, local_name);
+        Logger logger = new Logger();
+        MessagePasser mp = new MessagePasser(config_file, local_name, logger);
 
         // cl runs the main interactive process
-        ClientThread cl = new ClientThread(mp);
+        ClientThread cl = new ClientThread(mp,logger);
         cl.run();
 
         

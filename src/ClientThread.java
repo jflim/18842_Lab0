@@ -13,11 +13,12 @@ public class ClientThread implements Runnable{
 
 
     private MessagePasser messagePasser;
+    private Logger logger;
     private int port;
 
-    public ClientThread(MessagePasser messagePasser) {
+    public ClientThread(MessagePasser messagePasser, Logger logger) {
         this.messagePasser = messagePasser;
-        
+        this.logger = logger;
     }
 
     @Override
@@ -46,9 +47,6 @@ public class ClientThread implements Runnable{
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Do you want to log this message? Y: N");
-                line = scan.nextLine();
-                if(line.equalsIgnoreCase("Y"))
 
             }
         	else if(command.equalsIgnoreCase("exit")){
@@ -68,7 +66,6 @@ public class ClientThread implements Runnable{
 
     /**
      * Error printing function
-     * @param string
      */
 	private void usage() {
 		System.out.println("Usage:");

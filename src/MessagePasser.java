@@ -39,6 +39,7 @@ public class MessagePasser {
 	private Queue<TimeStampedMessage> receivedQueue;
     private boolean isProcessedRules = false;
     private ClockService clock = null;
+    Logger logger;
 	// node configuration
 	Map<String, Node> nodes;
 
@@ -60,10 +61,10 @@ public class MessagePasser {
 		}
 	}
 
-	public MessagePasser(String configuration_filename, String local_name) {
+	public MessagePasser(String configuration_filename, String local_name, Logger logger) {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
-
+        this.logger = logger;
 		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
@@ -355,6 +356,11 @@ public class MessagePasser {
         
         // Add TimeStamp to Message
         TimeStampedMessage timeStampedMessage = new TimeStampedMessage(message, this.clock.copy());
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Do you want to log this message? Y: N");
+        String line = scan.nextLine();
+        if(line.equalsIgnoreCase("Y"))
+            this.logger.logs.add(timeStampedMessage);
 		getSendRules();
 		checkSendRules(timeStampedMessage);
 	}
@@ -466,7 +472,7 @@ public class MessagePasser {
 					continue;
 				}
 				
-				Thread thread = new Thread(new WorkThread(clientSocket, this));
+				Thread thread = new Thread(new WorkThread(clientSocket, this, logger));
 				thread.start();
 				
 				try {

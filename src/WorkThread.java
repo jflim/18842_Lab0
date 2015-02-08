@@ -11,10 +11,11 @@ import java.util.Scanner;
 public class WorkThread implements Runnable{
     private Socket socket;
     private MessagePasser messagePasser;
-
-    public WorkThread(Socket socket, MessagePasser messagePasser){
+    private Logger logger;
+    public WorkThread(Socket socket, MessagePasser messagePasser, Logger logger){
         this.socket = socket;
         this.messagePasser = messagePasser;
+        this.logger = logger;
     }
 
 	@Override
@@ -37,7 +38,7 @@ public class WorkThread implements Runnable{
 
                     String line = scan.nextLine();
                     if(line.equalsIgnoreCase("Y"))
-
+                        this.messagePasser.logger.logs.add(processedMessage);
                     messagePasser.getClock().setClock(processedMessage.getTimeStamp());
 					processedMessage = this.messagePasser.receiveMessage();
 
