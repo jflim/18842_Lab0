@@ -34,7 +34,10 @@ public class Message implements Serializable {
 	public void set_duplicate(Boolean dup) {
         this.dup = dup;
 	}
-	
+
+    public void set_dst(String dst) {
+        this.dest = dst;
+    }
 	// other accessors, toString, etc as needed
 	
 }

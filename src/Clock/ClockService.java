@@ -6,9 +6,9 @@ import java.util.Map;
  */
 public abstract class ClockService {
     private static ClockService clock = null;
-    public static ClockService newClock(boolean isLogicalClock, int selfIndex, int size){
+    public static ClockService newClock(String isLogicalClock, int selfIndex, int size){
 
-        if(isLogicalClock){
+        if(isLogicalClock.equalsIgnoreCase("true")){
             clock = new LogicalClock();
         }
         else{

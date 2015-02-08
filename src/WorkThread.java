@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class WorkThread implements Runnable{
     private Socket socket;
     private MessagePasser messagePasser;
-    public WorkThread(Socket socket, MessagePasser messagePasser, Logger logger){
+    public WorkThread(Socket socket, MessagePasser messagePasser){
         this.socket = socket;
         this.messagePasser = messagePasser;
     }
@@ -32,11 +32,14 @@ public class WorkThread implements Runnable{
 					System.out.println("Data: " + processedMessage.data
 							+ " SeqNum: " + processedMessage.seqNum
 							+ " Duplicate: " + processedMessage.dup + " Timestamp: " + processedMessage.getTimeStamp());
+                    //log message
                     System.out.println("Do you want to log this message? Y: N");
-
                     String line = scan.nextLine();
-                    if(line.equalsIgnoreCase("Y"))
-                        this.messagePasser.logger.logs.add(processedMessage);
+                    if(line.equalsIgnoreCase("Y")){
+                        processedMessage.set_dst("logger");
+                        messagePasser.send(processedMessage);
+                    }
+                    //ajust clock
                     messagePasser.getClock().setClock(processedMessage.getTimeStamp());
 					processedMessage = this.messagePasser.receiveMessage();
 

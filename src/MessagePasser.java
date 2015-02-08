@@ -39,7 +39,7 @@ public class MessagePasser {
 	private Queue<TimeStampedMessage> receivedQueue;
     private boolean isProcessedRules = false;
     private ClockService clock = null;
-    Logger logger;
+
 	// node configuration
 	Map<String, Node> nodes;
 
@@ -64,7 +64,7 @@ public class MessagePasser {
 	public MessagePasser(String configuration_filename, String local_name) {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
-        this.logger = new Logger();
+
 		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
@@ -76,8 +76,6 @@ public class MessagePasser {
 
 		try {
 			parseConfig();
-
-            setClock();
 
 			serverSetUp();
 
@@ -104,29 +102,23 @@ public class MessagePasser {
 		if (m.containsKey("configuration")) {
 			parseNodes(m.get("configuration"));
 		}
-	}
-    /**
-     * set global clock
-     *
-     * @throws FileNotFoundException
-     */
+        else if(this.clock == null && m.containsKey("clock")){
+            ArrayList<LinkedHashMap<String, Object>> clockRule = m.get("clock");
+            String clockType = (String) clockRule.get(0).get("Logical");
+                // determine local_index according to node hashmap
+                int local_index = 0;
+                Iterator<String> x = nodes.keySet().iterator();
+                while(x.hasNext()){
+                    String nodeName = x.next();
+                    if(nodeName.equals(local_name)){
+                        break;
+                    }
+                    local_index++;
+                }
+                clock = ClockService.newClock(clockType, local_index, nodes.size());
 
-    public void setClock(){
-        if(this.clock == null){
-        	
-        	// determine local_index according to node hashmap
-        	int local_index = 0;
-            Iterator<String> x = nodes.keySet().iterator();
-            while(x.hasNext()){
-            	String nodeName = x.next();
-            	if(nodeName.equals(local_name)){
-            		break;
-            	}
-            	local_index++;
-            }
-            clock = ClockService.newClock(true, local_index, nodes.size());
         }
-    }
+	}
     
 	/**
 	 * parse the configuration file and store the sendRules
@@ -348,21 +340,13 @@ public class MessagePasser {
 	 * @param message
 	 */
 
-	public void send(Message message) throws FileNotFoundException {
-		message.set_source(local_name);
-		message.set_seqNum(seqNum++);
-		message.set_duplicate(false);
-        this.clock.clockIncrement();
+	public void send(TimeStampedMessage message) throws FileNotFoundException {
         
         // Add TimeStamp to Message
-        TimeStampedMessage timeStampedMessage = new TimeStampedMessage(message, this.clock.copy());
-        Scanner scan = new Scanner(System.in);
-        System.out.println("Do you want to log this message? Y: N");
-        String line = scan.nextLine();
-        if(line.equalsIgnoreCase("Y"))
-            this.logger.logs.add(timeStampedMessage);
+
 		getSendRules();
-		checkSendRules(timeStampedMessage);
+		checkSendRules(message);
+
 	}
 
 	/**
@@ -472,7 +456,7 @@ public class MessagePasser {
 					continue;
 				}
 				
-				Thread thread = new Thread(new WorkThread(clientSocket, this, logger));
+				Thread thread = new Thread(new WorkThread(clientSocket, this));
 				thread.start();
 				
 				try {
