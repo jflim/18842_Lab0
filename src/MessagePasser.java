@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import Clock.ClockService;
+
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -110,9 +111,22 @@ public class MessagePasser {
      */
 
     public void setClock(){
-        if(this.clock == null)
-            clock = ClockService.newClock(true, local_name);
+        if(this.clock == null){
+        	
+        	// determine local_index according to node hashmap
+        	int local_index = 0;
+            Iterator<String> x = nodes.keySet().iterator();
+            while(x.hasNext()){
+            	String nodeName = x.next();
+            	if(nodeName.equals(local_name)){
+            		break;
+            	}
+            	local_index++;
+            }
+            clock = ClockService.newClock(true, local_index, nodes.size());
+        }
     }
+    
 	/**
 	 * parse the configuration file and store the sendRules
 	 *
@@ -338,6 +352,7 @@ public class MessagePasser {
 		message.set_seqNum(seqNum++);
 		message.set_duplicate(false);
         this.clock.clockIncrement();
+        
         // Add TimeStamp to Message
         TimeStampedMessage timeStampedMessage = new TimeStampedMessage(message, this.clock.copy());
 		getSendRules();

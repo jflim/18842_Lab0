@@ -7,7 +7,6 @@ public class LogicalClock extends ClockService{
     private int counter = 0;
     public LogicalClock(){
         this.counter = 0;
-
     }
 
     public void clockIncrement() {
