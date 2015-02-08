@@ -61,10 +61,10 @@ public class MessagePasser {
 		}
 	}
 
-	public MessagePasser(String configuration_filename, String local_name, Logger logger) {
+	public MessagePasser(String configuration_filename, String local_name) {
 		this.configuration_filename = configuration_filename;
 		this.local_name = local_name;
-        this.logger = logger;
+        this.logger = new Logger();
 		nodes = new LinkedHashMap<String, Node>();
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();

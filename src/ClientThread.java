@@ -13,12 +13,10 @@ public class ClientThread implements Runnable{
 
 
     private MessagePasser messagePasser;
-    private Logger logger;
     private int port;
 
-    public ClientThread(MessagePasser messagePasser, Logger logger) {
+    public ClientThread(MessagePasser messagePasser) {
         this.messagePasser = messagePasser;
-        this.logger = logger;
     }
 
     @Override

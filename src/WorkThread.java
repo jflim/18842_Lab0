@@ -11,11 +11,9 @@ import java.util.Scanner;
 public class WorkThread implements Runnable{
     private Socket socket;
     private MessagePasser messagePasser;
-    private Logger logger;
     public WorkThread(Socket socket, MessagePasser messagePasser, Logger logger){
         this.socket = socket;
         this.messagePasser = messagePasser;
-        this.logger = logger;
     }
 
 	@Override
