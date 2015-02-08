@@ -26,12 +26,13 @@ public class WorkThread implements Runnable{
 				messagePasser.receive(socket, input);
 
 				// actually return the message content.
-				Message processedMessage = this.messagePasser.receiveMessage();
+				TimeStampedMessage processedMessage = this.messagePasser.receiveMessage();
 				while (processedMessage != null) {
 					System.out.println("Data: " + processedMessage.data
 							+ " SeqNum: " + processedMessage.seqNum
 							+ " Duplicate: " + processedMessage.dup);
 					processedMessage = this.messagePasser.receiveMessage();
+                    messagePasser.getClock().setClock(processedMessage.getTimeStamp());
 				}
 			}
 		} catch (IOException e) {

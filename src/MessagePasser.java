@@ -32,10 +32,10 @@ public class MessagePasser {
 	private HashMap<String, Socket> sockets;
 	private HashMap<String, ObjectOutputStream> outputStreams;
 	private HashMap<ObjectInputStream, ObjectOutputStream> connectStreams;
-	
-	private Queue<Message> delayQueue;
-	private Queue<Message> receivedDelayQueue;
-	private Queue<Message> receivedQueue;
+
+	private Queue<TimeStampedMessage> delayQueue;
+	private Queue<TimeStampedMessage> receivedDelayQueue;
+	private Queue<TimeStampedMessage> receivedQueue;
     private boolean isProcessedRules = false;
     private ClockService clock = null;
 	// node configuration
@@ -67,11 +67,11 @@ public class MessagePasser {
 		sockets = new HashMap<String, Socket>();
 		outputStreams = new HashMap<String, ObjectOutputStream>();
 		connectStreams = new HashMap<ObjectInputStream, ObjectOutputStream>();
-		
-		delayQueue = new LinkedList<Message>();
-		receivedDelayQueue = new LinkedList<Message>();
-		receivedQueue = new LinkedList<Message>();
-		
+
+		delayQueue = new LinkedList<TimeStampedMessage>();
+		receivedDelayQueue = new LinkedList<TimeStampedMessage>();
+		receivedQueue = new LinkedList<TimeStampedMessage>();
+
 		try {
 			parseConfig();
 
@@ -173,7 +173,7 @@ public class MessagePasser {
 	 * Check an outgoing message with the sending rules. First rule that matches
 	 * is applied to the message. Called by MessagePasser.send()
 	 */
-	public synchronized void checkSendRules(Message message) {
+	public synchronized void checkSendRules(TimeStampedMessage message) {
         // there are no receive rules
         if(sendRules == null || sendRules.isEmpty()){
             sendMessage(message);
@@ -203,9 +203,9 @@ public class MessagePasser {
 	 * Check an incoming message with the receive rules. First rule that matches
 	 * is applied to the message.
 	 */
-	public synchronized void checkReceiveRules(Message message) {
+	public synchronized void checkReceiveRules(TimeStampedMessage message) {
         isProcessedRules = false;
-        
+
         // there are no receive rules
         if(receiveRules == null || receiveRules.isEmpty()){
             receivedQueue.add(message);
@@ -214,7 +214,7 @@ public class MessagePasser {
             }
             return;
         }
-        
+
         // check if any rules match
 		for (LinkedHashMap<String, Object> rule : receiveRules) {
 			System.out.println(receiveRules);
@@ -224,7 +224,7 @@ public class MessagePasser {
 				break;
 			}
 		}
-		
+
 		// no rules match
         if(isProcessedRules != true) {
             receivedQueue.add(message);
@@ -242,7 +242,7 @@ public class MessagePasser {
 	 * @return true  if a rule matches
 	 * 		   false if a rule doesn't match
 	 */
-	private boolean checkRule(Message message,
+	private boolean checkRule(TimeStampedMessage message,
 			LinkedHashMap<String, Object> rule) {
 		// check all the rule entries with message attributes
 
@@ -259,7 +259,7 @@ public class MessagePasser {
 				&& !((String) rule.get("kind")).equalsIgnoreCase(message.kind)) {
 			return false;
 		}
-		if (rule.containsKey("seqNum") 
+		if (rule.containsKey("seqNum")
 				&& !(((Integer) rule.get("seqNum")).equals(message.seqNum))) {
 			return false;
 		}
@@ -277,7 +277,7 @@ public class MessagePasser {
 	 *
 	 * @param message
 	 */
-	public synchronized void processSendRule(String action, Message message) {
+	public synchronized void processSendRule(String action, TimeStampedMessage message) {
 
 		if (action.equalsIgnoreCase("drop")) {
             System.out.println("Drop");
@@ -291,15 +291,15 @@ public class MessagePasser {
 		} else if (action.equalsIgnoreCase("duplicate")) {
             System.out.println("Duplicate");
 			sendMessage(message);
-			Message m = new Message(message);
+			TimeStampedMessage m = new TimeStampedMessage(message);
 			m.set_duplicate(true);
 		    sendMessage(m);
-		     
+
 			//sent a non-delayed message. send any delayed messages
 			while (!this.delayQueue.isEmpty()) {
 				sendMessage(delayQueue.remove());
 			}
-		}	
+		}
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class MessagePasser {
 	 *
 	 * @param message
 	 */
-	public synchronized void processReceiveRule(String action, Message message) {
+	public synchronized void processReceiveRule(String action, TimeStampedMessage message) {
 		if (action.equals("drop")) {
             System.out.println("Drop");
             message = null;
@@ -317,19 +317,19 @@ public class MessagePasser {
             message = null;
             return;
 		} else if (action.equals("duplicate")) { // 2 messages
-			Message duplicateMessage = new Message(message);
+			TimeStampedMessage duplicateMessage = new TimeStampedMessage(message);
             this.receivedQueue.add(message);
 			duplicateMessage.set_duplicate(true);
 			this.receivedQueue.add(duplicateMessage);
 			while (!this.receivedDelayQueue.isEmpty()) {
-				this.receivedQueue.add(this.receivedDelayQueue.remove());				
+				this.receivedQueue.add(this.receivedDelayQueue.remove());
 			}
 		}
 	}
 
 	/**
 	 * Request to send message to other processes
-	 * 
+	 *
 	 * @param message
 	 */
 
@@ -348,20 +348,20 @@ public class MessagePasser {
 	 * Receive message from other processes
 	 *
 	 */
-	public Message receiveMessage() {
-		Message message = this.receivedQueue.poll();
+	public TimeStampedMessage receiveMessage() {
+		TimeStampedMessage message = this.receivedQueue.poll();
 		return message;
 	}
 
 	/**
 	 * Request to receive message from other processes
-	 * @param socket 
+	 * @param socket
 	 *
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
 	public void receive(Socket socket, ObjectInputStream input) throws ClassNotFoundException, IOException {
-		Message receivedMessage = (Message) input.readObject();
+		TimeStampedMessage receivedMessage = (TimeStampedMessage) input.readObject();
 		// may throw IO exception.
 
         //add the socket and stream of the sender.
@@ -378,7 +378,7 @@ public class MessagePasser {
 			}
 
         }
-		
+
 	    if(receivedMessage != null) {
             getReceiveRules();
             checkReceiveRules(receivedMessage);
@@ -401,7 +401,7 @@ public class MessagePasser {
 	 * Send message that matched the rule
 	 * through use of streams
 	 */
-	public void sendMessage(Message message) {
+	public void sendMessage(TimeStampedMessage message) {
 
 		Socket clientSocket = null;
 		ObjectOutputStream output = null;
@@ -548,4 +548,8 @@ public class MessagePasser {
 			}
 		}
 	}
+
+    public ClockService getClock(){
+        return this.clock;
+    }
 }
