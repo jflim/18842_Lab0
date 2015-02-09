@@ -41,7 +41,7 @@ public class ClientThread implements Runnable{
 				System.out.println("Enter the message content: ");
 				String content = scan.nextLine();
 				TimeStampedMessage m = new TimeStampedMessage(target, kind,
-						content, messagePasser.getClock());
+						content, messagePasser.getClock().copy());
 				try {
 					m.set_source(messagePasser.local_name);
 					m.set_seqNum(messagePasser.seqNum++);
@@ -68,8 +68,8 @@ public class ClientThread implements Runnable{
         		usage();
         	}
             else if(command.equalsIgnoreCase("time")){
-                int m = (Integer)messagePasser.getClock().getClock();
-                System.out.println("Time: " + m);
+
+                System.out.println(messagePasser.getClock());
             }
 
         }

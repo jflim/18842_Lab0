@@ -14,17 +14,17 @@ public class TimeStampedMessage extends Message implements Serializable{
 	public TimeStampedMessage(String dest, String kind, Object data,
 			ClockService timeStamp) {
 		super(dest, kind, data);
-        this.timeStamp = timeStamp;
+        this.timeStamp = timeStamp.copy();
 
     }
     public TimeStampedMessage(TimeStampedMessage message) {
         super(message);
-        this.timeStamp = message.timeStamp;
+        this.timeStamp = message.timeStamp.copy();
     }
 
     public TimeStampedMessage(Message message, ClockService timeStamp) {
         super(message);
-        this.timeStamp = timeStamp;
+        this.timeStamp = timeStamp.copy();
 
     }
     
