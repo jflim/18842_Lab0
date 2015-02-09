@@ -40,6 +40,9 @@ public class ClientThread implements Runnable{
 				String target = tmpline[2];
 				System.out.println("Enter the message content: ");
 				String content = scan.nextLine();
+				
+				messagePasser.getClock().clockIncrement(); //clock increment before sending
+				
 				TimeStampedMessage m = new TimeStampedMessage(target, kind,
 						content, messagePasser.getClock().copy());
 				try {
@@ -54,7 +57,6 @@ public class ClientThread implements Runnable{
 						messagePasser.sendMessageToLogger(m);
 					}
 
-					messagePasser.getClock().clockIncrement(); //clock increment
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
