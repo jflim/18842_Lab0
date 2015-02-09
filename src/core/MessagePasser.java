@@ -114,7 +114,7 @@ public class MessagePasser {
         // set up the clock
 		if (this.clock == null && m.containsKey("clock")) {
 			ArrayList<LinkedHashMap<String, Object>> clockRule = m.get("clock");
-			boolean isLogical = (boolean) clockRule.get(0).get("Logical");
+			boolean isLogical = (Boolean) clockRule.get(0).get("Logical");
 			
 			// determine local_index according to node hashmap
 			int local_index = 0;
