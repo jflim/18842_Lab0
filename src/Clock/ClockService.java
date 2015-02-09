@@ -24,4 +24,5 @@ public abstract class ClockService implements Serializable{
     public abstract Object getClock();
     public abstract ClockService copy();
     public abstract int compareTo(ClockService clock);
+    public abstract String toString();
 }
