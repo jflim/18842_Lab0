@@ -49,7 +49,7 @@ public class Logger {
             displayMessage(x);
         }
 
-        System.out.println("Concurrent message:");
+        System.out.println("\nConcurrent message:");
 
         for (int i = 0; i < logs.size() - 1; i++) {
             for (int j = i + 1; j < logs.size(); j++) {
