@@ -24,9 +24,9 @@ public class ClientThread implements Runnable{
     public void run()
     {
     	Scanner scan = new Scanner(System.in);
-    	
+    	usage();
         while(true){
-        	usage();
+        	printPrompt();
         	String line = scan.nextLine();
         	String[] tmpline = line.split("\\s+");
             ClockService clock;
@@ -75,10 +75,16 @@ public class ClientThread implements Runnable{
         }
     }
 
-    /**
+    private void printPrompt() {
+		System.out.print("\n% ");
+		
+	}
+
+	/**
      * Error printing function
      */
 	private void usage() {
+		System.out.println();
 		System.out.println("Usage:");
 		System.out.println("send [kind] [target node]");
 		System.out.println("help -display this help message");
