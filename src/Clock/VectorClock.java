@@ -114,4 +114,22 @@ public class VectorClock extends ClockService{
 	public Object getClock() {
 		return counters;
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		int i;
+		if (size == 1) {
+			return Integer.toString(counters[0]);
+		}
+
+		else {
+			for (i = 0; i < size - 1; i++) {
+				sb.append(counters[i]);
+				sb.append(":");
+			}
+			sb.append(counters[size - 1]);
+			return sb.toString();
+		}
+	}
 }

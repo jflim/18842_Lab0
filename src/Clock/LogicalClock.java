@@ -35,4 +35,9 @@ public class LogicalClock extends ClockService{
             return 1;
         return 0;
     }
+
+	@Override
+	public String toString() {
+		return Integer.toString(counter);
+	}
 }
