@@ -58,30 +58,47 @@ public class VectorClock extends ClockService{
 	 *  2 : concurrent clocks
 	 */
 	public int compareTo(ClockService other){
-		int index;
-		
-		int initialthis  = this.getClockValue(0);
-		int initialother = ((VectorClock) other).getClockValue(0);
-		
+//		int index;
+//
+//		int initialthis  = this.getClockValue(0);
+//		int initialother = ((VectorClock) other).getClockValue(0);
+//
 		// set initial values
-		int status = compare(initialthis, initialother);
-		
-		for(index = 1; index < size; index++){
-			int a = this.getClockValue(index);
-			int b = ((VectorClock)other).getClockValue(index);
-			
-			int nextStatus = compare(a,b);
-			if(nextStatus == 0){
-				continue;
-			}
-			else if(status == 0){ // they were equal before.
-				status = nextStatus;
-			}
-			else if(nextStatus != status){ //concurrent
-				return 2;
-			}
-		}
-		return status;	
+//		int status = compare(initialthis, initialother);
+//
+//		for(index = 1; index < size; index++){
+//			int a = this.getClockValue(index);
+//			int b = ((VectorClock)other).getClockValue(index);
+//
+//			int nextStatus = compare(a,b);
+//			if(nextStatus == 0){
+//				continue;
+//			}
+//			else if(status == 0){ // they were equal before.
+//				status = nextStatus;
+//			}
+//			else if(nextStatus != status){ //concurrent
+//				return 2;
+//			}
+//		}
+//		return status;
+
+        boolean less = false;
+        boolean greater = false;
+        for (int i = 0; i < size; i++) {
+            int my = this.getClockValue(i);
+            int oth = ((VectorClock) other).getClockValue(i);
+            if (my < oth)
+                less = true;
+            else if (my > oth)
+                greater = true;
+        }
+        if (less && !greater)
+            return -1;
+        else if (greater && !less)
+            return 1;
+
+        return 0;
 	}
 	
 	private int compare(int a, int b){
