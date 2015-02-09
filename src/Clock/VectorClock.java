@@ -41,7 +41,10 @@ public class VectorClock extends ClockService{
 	@Override
 	public ClockService copy() {
         VectorClock clock = new VectorClock(selfIndex, size);
-        clock.counters = this.counters;
+        int i = 0;
+        for(i = 0 ; i < size; i++){
+        	clock.counters[i] = this.counters[i];
+        }
         return clock;
     }
 	
