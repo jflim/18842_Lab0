@@ -1,10 +1,11 @@
 package Clock;
 
+import java.io.Serializable;
 import java.util.Map;
 /**
  * Created by gs on 2/6/15.
  */
-public abstract class ClockService {
+public abstract class ClockService implements Serializable{
     private static ClockService clock = null;
     public static ClockService newClock(boolean isLogicalClock, int selfIndex, int size){
 

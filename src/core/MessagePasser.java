@@ -234,7 +234,6 @@ public class MessagePasser {
 
         // check if any rules match
         for (LinkedHashMap<String, Object> rule : receiveRules) {
-            System.out.println(receiveRules);
             if (checkRule(message, rule)) { // if rule matched
                 processReceiveRule((String) rule.get("action"), message);
                 isProcessedRules = true;

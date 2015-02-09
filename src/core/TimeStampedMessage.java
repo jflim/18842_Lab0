@@ -9,16 +9,11 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class TimeStampedMessage extends Message implements Serializable{
 
-    String src;
-    String dest;
-    String kind;
-    int seqNum;
-    boolean dup;
-    Object data; //content of the message
     private ClockService timeStamp;
 
-    public TimeStampedMessage(String dest, String kind, Object data, ClockService timeStamp) {
-        super(dest, kind, data);
+	public TimeStampedMessage(String dest, String kind, Object data,
+			ClockService timeStamp) {
+		super(dest, kind, data);
         this.timeStamp = timeStamp;
 //        this.dest = dest;
 //        this.kind = kind;
