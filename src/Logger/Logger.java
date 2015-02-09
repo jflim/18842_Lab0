@@ -31,6 +31,7 @@ public class Logger {
 
 		Scanner scan = new Scanner(System.in);
 		while (true) {
+			System.out.println("Command: ");
 			String input = scan.nextLine();
 			if (input.equals("print log")) {
 				displayLog();

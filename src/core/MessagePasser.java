@@ -66,8 +66,9 @@ public class MessagePasser {
         }
     }
 
-    public MessagePasser(String configuration_filename, String local_name, boolean isLogger, List<TimeStampedMessage> logs) {
-        this.configuration_filename = configuration_filename;
+	public MessagePasser(String configuration_filename, String local_name,
+			boolean isLogger, List<TimeStampedMessage> logs) {
+		this.configuration_filename = configuration_filename;
         this.local_name = local_name;
 
         nodes = new LinkedHashMap<String, Node>();
@@ -79,6 +80,10 @@ public class MessagePasser {
         receivedDelayQueue = new LinkedList<TimeStampedMessage>();
         receivedQueue = new LinkedList<TimeStampedMessage>();
 
+        // logger variables
+        this.isLogger = isLogger;
+        this.logs = logs;
+        
         try {
             parseConfig();
 
@@ -405,8 +410,9 @@ public class MessagePasser {
     public void serverSetUp() throws Exception {
 
         // start up the listening socket
-        ServerThread serverThread = new ServerThread(this, nodes.get(local_name).port, isLogger, logs);
-        new Thread(serverThread).start();
+		ServerThread serverThread = new ServerThread(this,
+				nodes.get(local_name).port, isLogger, logs);
+		new Thread(serverThread).start();
         System.out.println("Server thread on port " + nodes.get(local_name).port);
 
     }
@@ -423,22 +429,22 @@ public class MessagePasser {
 	private void sendMessage(TimeStampedMessage message, boolean toLogger) {
 		String targetName = message.dest;
     	if(toLogger == true){
-    		targetName = "Logger";
+    		targetName = "logger";
     	}
     	
         Socket clientSocket = null;
         ObjectOutputStream output = null;
 
         // If the connection has been established
-        if (sockets.get(message.dest) != null) {
-            clientSocket = sockets.get(message.dest);
-            output = outputStreams.get(message.dest);
+        if (sockets.get(targetName) != null) {
+            clientSocket = sockets.get(targetName);
+            output = outputStreams.get(targetName);
             try {
                 output.writeObject(message);
             } catch (IOException e) {
                 // assume the connection is dead.
                 System.err.println("Connection refused. Check the receiving side.");
-                this.removeSocket(message.dest);
+                this.removeSocket(targetName);
                 return;
             }
         } else {

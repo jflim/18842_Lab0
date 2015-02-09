@@ -46,6 +46,7 @@ public class WorkThread implements Runnable{
 					
 					if(isLogger){
 						logs.add(processedMessage);
+						System.out.println("logging message!");
 					}
  
 					else {
