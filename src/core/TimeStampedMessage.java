@@ -54,8 +54,17 @@ public class TimeStampedMessage extends Message implements Serializable{
 	public int getSeqNum() {
 		return this.seqNum;
 	}
-	public boolean getDup() {
+
+    public boolean getDup() {
 		return this.dup;
 	}
+
+    public String get_source(){
+        return this.src;
+    }
+
+    public String get_dst() {
+        return this.dest;
+    }
 	
 }

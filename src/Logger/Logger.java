@@ -44,20 +44,26 @@ public class Logger {
 	private void displayLog() {
         Collections.sort(logs, new TimeStampedMessageComparator());
         Iterator<TimeStampedMessage> it = logs.iterator();
-        while (it.hasNext()) {
-            TimeStampedMessage x = it.next();
-            displayMessage(x);
-        }
+//        while (it.hasNext()) {
+//            TimeStampedMessage x = it.next();
+//            displayMessage(x);
+//        }
 
-        System.out.println("\nConcurrent message:");
+
 
         for (int i = 0; i < logs.size() - 1; i++) {
             for (int j = i + 1; j < logs.size(); j++) {
                 if ((logs.get(i).getTimeStamp()).compareTo(logs.get(j).getTimeStamp()) == 0) {
+                    System.out.println("\nConcurrent message:");
                     displayMessage(logs.get(i));
                     displayMessage(logs.get(j));
                     System.out.println("");
 
+                }else{
+                    System.out.println("\nMessage in sequence:");
+                    displayMessage(logs.get(i));
+                    displayMessage(logs.get(j));
+                    System.out.println("");
                 }
             }
 
@@ -65,7 +71,9 @@ public class Logger {
     }
 
 	private void displayMessage(TimeStampedMessage processedMessage){
-		System.out.println("Data: " + processedMessage.getData()
+		System.out.println("Src: " + processedMessage.get_source()
+                + " Dest: " + processedMessage.get_dst()
+                + " Data: " + processedMessage.getData()
 				+ " SeqNum: " + processedMessage.getSeqNum()
 				+ " Duplicate: " + processedMessage.getDup()
 				+ " Timestamp: "
