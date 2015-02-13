@@ -10,8 +10,8 @@ public class VectorClock extends ClockService{
 	private int selfIndex;
 	
     public VectorClock(int selfIndex, int size){
-		counters = new int[size];
-		this.size = size;
+		counters = new int[size - 1]; // subtract logger from clock calc.
+		this.size = size - 1;
 		this.selfIndex = selfIndex;
     }
 

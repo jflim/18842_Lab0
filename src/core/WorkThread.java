@@ -40,16 +40,17 @@ public class WorkThread implements Runnable{
 				TimeStampedMessage processedMessage = this.messagePasser.receiveMessage();
 				while (processedMessage != null) {
 					
-					// adjust clock
-					messagePasser.getClock().setClock(
-							processedMessage.getTimeStamp());
-					
 					if(isLogger){
 						logs.add(processedMessage);
 						System.out.println("logging message!");
 					}
  
 					else {
+						
+						// adjust clock
+						messagePasser.getClock().setClock(
+								processedMessage.getTimeStamp());
+						
 						System.out.println("Data: " + processedMessage.data
 								+ " SeqNum: " + processedMessage.seqNum
 								+ " Duplicate: " + processedMessage.dup
