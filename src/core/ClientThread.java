@@ -93,5 +93,7 @@ public class ClientThread implements Runnable{
 		System.out.println("send [kind] [target node]");
 		System.out.println("help -display this help message");
 		System.out.println("exit -exit the program");
+		System.out.println("time -display the current timestamps");
+		System.out.println("generate -increment timestamp and display");
 	}
 }
