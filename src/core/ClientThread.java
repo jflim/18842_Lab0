@@ -41,8 +41,6 @@ public class ClientThread implements Runnable{
 				System.out.println("Enter the message content: ");
 				String content = scan.nextLine();
 				
-				messagePasser.getClock().clockIncrement(); //clock increment before sending
-				
 				TimeStampedMessage m = new TimeStampedMessage(target, kind,
 						content, messagePasser.getClock().copy());
 				try {
@@ -72,6 +70,10 @@ public class ClientThread implements Runnable{
             else if(command.equalsIgnoreCase("time")){
 
                 System.out.println(messagePasser.getClock());
+            }
+        	
+            else if(command.equalsIgnoreCase("generate")){
+            	System.out.println(messagePasser.incrementClock());
             }
 
         }

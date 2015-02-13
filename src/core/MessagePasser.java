@@ -358,8 +358,9 @@ public class MessagePasser {
     public void send(TimeStampedMessage message) throws FileNotFoundException {
 
         // Add TimeStamp to Message
-
-        getSendRules();
+    	this.getClock().clockIncrement(); // clock increment before sending
+ 
+    	getSendRules();
         checkSendRules(message);
 
     }
@@ -404,6 +405,15 @@ public class MessagePasser {
         }
     }
 
+    /**
+     * method for message passer to increment clock
+     * @return
+     */
+    public ClockService incrementClock(){
+    	clock.clockIncrement();
+    	return clock;   	
+    }
+    
     /**
      * Setup server thread and client to send message
      */
