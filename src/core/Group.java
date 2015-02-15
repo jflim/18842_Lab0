@@ -14,21 +14,38 @@ import java.util.Map;
  */
 public class Group {
     private String groupName;
-    private List<String> membersName;
+    private List<String> memberNames;
     private Map<String, Node> membersNodes;
-    private ClockService groupTimeStamp;
+    //private ClockService groupTimeStamp;
 
-    public Group(String groupName, List<String> membersName, Map<String, Node>  nodes, ClockService groupTimeStamp){
-        this.groupName = groupName;
-        this.membersName = membersName;
-        this.groupTimeStamp = groupTimeStamp;
+	public Group(String groupName, List<String> memberNames,
+			Map<String, Node> nodes, ClockService groupTimeStamp) {
+		this.groupName = groupName;
+		this.memberNames = memberNames;
+		//this.groupTimeStamp = groupTimeStamp;
 
-        this.membersNodes = new HashMap<String, Node>();
-        for(String name : nodes.keySet()){
-            if(membersName.contains(name)) {
-                this.membersNodes.put(name, nodes.get(name));
-            }
-        }
+		this.membersNodes = new HashMap<String, Node>();
+		for (String name : nodes.keySet()) {
+			if (memberNames.contains(name)) {
+				this.membersNodes.put(name, nodes.get(name));
+			}
+		}
 
-    }
+	}
+	
+	
+	// getters
+	
+	public String getName(){
+		return groupName;
+	}
+	
+	public Map<String, Node> getNodes(){
+		return membersNodes;
+	}
+	
+	public List<String> memberNames(){
+		return memberNames;
+		
+	}
 }
