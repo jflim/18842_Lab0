@@ -40,7 +40,7 @@ public class MessagePasser {
     private Queue<TimeStampedMessage> receivedQueue;
     private boolean isProcessedRules = false;
     private ClockService clock = null;
-
+    private HashMap<String, Group> groups;
     // node configuration
     Map<String, Node> nodes;
 
@@ -79,7 +79,7 @@ public class MessagePasser {
         delayQueue = new LinkedList<TimeStampedMessage>();
         receivedDelayQueue = new LinkedList<TimeStampedMessage>();
         receivedQueue = new LinkedList<TimeStampedMessage>();
-
+        this.groups = new HashMap<String, Group>();
         // logger variables
         this.isLogger = isLogger;
         this.logs = logs;
@@ -133,6 +133,18 @@ public class MessagePasser {
 			}
 			clock = ClockService.newClock(isLogical, local_index, nodes.size());
 		}
+
+        if (m.containsKey("groups")) {
+            ArrayList<LinkedHashMap<String, Object>> groupsList = m.get("groups");
+            for (LinkedHashMap<String, Object> group : groupsList) {
+                String groupName = (String) group.get("name");
+                ArrayList<String> members = (ArrayList<String>) group.get("members");
+                Group tmp = new Group(groupName, members, nodes, clock.copy());
+
+                groups.put(groupName, tmp);
+            }
+
+        }
     }
 
     /**

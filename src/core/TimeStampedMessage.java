@@ -10,13 +10,14 @@ import java.io.Serializable;
 public class TimeStampedMessage extends Message implements Serializable{
 
     private ClockService timeStamp;
-
+    private String groupName = null;
 	public TimeStampedMessage(String dest, String kind, Object data,
 			ClockService timeStamp) {
 		super(dest, kind, data);
         this.timeStamp = timeStamp.copy();
 
     }
+
     public TimeStampedMessage(TimeStampedMessage message) {
         super(message);
         this.timeStamp = message.timeStamp.copy();
@@ -27,7 +28,14 @@ public class TimeStampedMessage extends Message implements Serializable{
         this.timeStamp = timeStamp.copy();
 
     }
-    
+
+    public TimeStampedMessage(String dest, String kind, Object data,
+        ClockService timeStamp, String num) {
+        super(dest, kind, data);
+        this.timeStamp = timeStamp.copy();
+        this.groupName = num;
+
+    }
     // These setters are used by MessagePasser.send, not the app
     public void set_source(String source) {
         this.src = source;

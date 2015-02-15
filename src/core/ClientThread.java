@@ -75,7 +75,45 @@ public class ClientThread implements Runnable{
             else if(command.equalsIgnoreCase("generate")){
             	System.out.println(messagePasser.incrementClock());
             }
+            else if(command.equalsIgnoreCase("multicast")){
+                if(tmpline.length != 2){
+                    continue;
+                }
+                String groupName = tmpline[1];
+                System.out.print("Please input the multicast message just as send command:");
+                line = scan.nextLine();
+                tmpline = line.split("\\s+");
+                command = tmpline[0];
 
+                if(command.equalsIgnoreCase("send")){
+                    if(tmpline.length != 3){
+                        continue;
+                    }
+                    String kind = tmpline[1];
+                    String target = tmpline[2];
+                    System.out.println("Enter the message content: ");
+                    String content = scan.nextLine();
+
+                    TimeStampedMessage m = new TimeStampedMessage(target, kind,
+                            content, messagePasser.getClock().copy(), groupName);
+                    try {
+                        m.set_source(messagePasser.local_name);
+                        m.set_seqNum(messagePasser.seqNum++);
+                        messagePasser.send(m);
+
+                        System.out.println("Do you want to log this message? Y: N");// log
+                        // message
+                        line = scan.nextLine();
+                        if (line.equalsIgnoreCase("Y")) {
+                            messagePasser.sendMessageToLogger(m);
+                        }
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
         }
     }
 
@@ -95,5 +133,6 @@ public class ClientThread implements Runnable{
 		System.out.println("exit -exit the program");
 		System.out.println("time -display the current timestamps");
 		System.out.println("generate -increment timestamp and display");
+        System.out.println("multicast [group] -multicast a message to a group");
 	}
 }
