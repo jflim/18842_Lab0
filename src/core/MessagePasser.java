@@ -6,8 +6,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import Clock.ClockService;
-
 import Multicast.MulticastService;
+
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -149,7 +149,9 @@ public class MessagePasser {
                     multicastService.addGroup(tmp);
                 groups.put(groupName, tmp);
             }
-
+            
+            multicastService.initCache();
+    		multicastService.initHoldBackQueue();
         }
     }
 

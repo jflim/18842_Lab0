@@ -28,6 +28,7 @@ public class TimeStampedMessage extends Message implements Serializable{
     public TimeStampedMessage(TimeStampedMessage message) {
         super(message);
         this.timeStamp = message.timeStamp.copy();
+        this.groupName = message.groupName;
     }
 
     public TimeStampedMessage(Message message, ClockService timeStamp) {

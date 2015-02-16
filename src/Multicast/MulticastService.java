@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class MulticastService {
 		gSeqNum = new HashMap<String, Integer>();
 		delivered = new HashMap<String, HashMap<String, Integer>>();
 		holdBackQueues = new HashMap<String, HashMap<String, List<TimeStampedMessage>>>();
+		caches = new HashMap<String, HashMap<String, List<TimeStampedMessage>>>();	
 
 		this.mp = mp; // get a reference to a MessagePasser
 	}
@@ -54,12 +56,13 @@ public class MulticastService {
 
 	public void send_multicast(String groupName, TimeStampedMessage m)
 			throws FileNotFoundException {
+		
+		//increment the sequence number before sending
+		this.gSeqNum.put(groupName, gSeqNum.get(groupName)+1);
 		int selfGroupSeqNum = this.gSeqNum.get(groupName);
 
 		for (String targetNode : delivered.get(groupName).keySet()) {
-			System.out.println("O:" +  targetNode);
 			TimeStampedMessage tm = new TimeStampedMessage(m);
-			System.out.println("print tm source" + tm.get_source());
 			tm.addGroupSeqNum(selfGroupSeqNum);
 			tm.addACKs(delivered.get(groupName));
 
@@ -72,9 +75,6 @@ public class MulticastService {
 	public void receive_multicast(String groupName, TimeStampedMessage m) {
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
-		System.out.println(m.get_source());
-		System.out.println(m.get_dst());
-		System.out.println(m.getData());
 		int R_for_sender = groupDelivers.get(m.get_source());
 		String missingSender; // sender whose message was missed. 
 
@@ -113,18 +113,27 @@ public class MulticastService {
 	 */
 	private void insertInHoldBackQueue(String groupName, TimeStampedMessage m) {
 
-		List<TimeStampedMessage> li = holdBackQueues.get(groupName).get(m.get_source());
-		li.add(m);
-		Collections.sort(li, new Comparator<TimeStampedMessage>(){
-			public int compare(TimeStampedMessage first, TimeStampedMessage second){
-				if(first.getGroupSeqNum() < second.getGroupSeqNum()){
-					return -1;
+		HashMap<String, List<TimeStampedMessage>> groupQueue = holdBackQueues.get(groupName);
+		if(groupQueue.containsKey(m.get_source())){
+			List<TimeStampedMessage> hbList = groupQueue.get(m.get_source());
+			groupQueue.get(m.get_source()).add(m);
+			Collections.sort(hbList, new Comparator<TimeStampedMessage>(){
+				public int compare(TimeStampedMessage first, TimeStampedMessage second){
+					if(first.getGroupSeqNum() < second.getGroupSeqNum()){
+						return -1;
+					}
+					else{
+						return 1;
+					}
 				}
-				else{
-					return 1;
-				}
-			}
-		});
+			});
+		}
+		else{ // not initialized yet
+			List<TimeStampedMessage> li = new LinkedList<TimeStampedMessage>();
+			li.add(m);
+			groupQueue.put(m.get_source(), li);
+		}
+
 	}
 
 	/**
@@ -157,15 +166,22 @@ public class MulticastService {
 
 	private void handleHoldBackQueue(String groupName, String src) {
 		List<TimeStampedMessage> li = holdBackQueues.get(groupName).get(src);
+		
+		if(li == null){ // holdBackQueue not even initialized
+			return;
+		}
 		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
 		ListIterator<TimeStampedMessage> listItor = li.listIterator();
 		while(listItor.hasNext()){
 			TimeStampedMessage tm = listItor.next();
 			if(tm.getGroupSeqNum() == groupDelivers.get(src) + 1){
 				groupDelivers.put(src, groupDelivers.get(src) +1);
-				deliver(tm);
+				listItor.remove();
+				TimeStampedMessage expectedMessage = new TimeStampedMessage(tm);
+				deliver(expectedMessage);
 			}
 			else if(tm.getGroupSeqNum() <= groupDelivers.get(src)){
+				listItor.remove();
 				continue; // if we somehow had a duplicate..
 			}
 			else{
@@ -218,11 +234,33 @@ public class MulticastService {
 				+ " Timestamp: " + m.getTimeStamp()    
 				+ " Group Name: " + m.getGroupName()
 				+ " Group Seq Num: "  + m.getGroupSeqNum());
-		List<TimeStampedMessage> l =  caches.get(m.getGroupName()).get(m.get_source());
-		l.add(m);
-		if(l.size() >  cacheSize){
-			l.remove(0);
+		
+		
+		if(caches.get(m.getGroupName()).containsKey(m.get_source())){
+			List<TimeStampedMessage> l = caches.get(m.getGroupName()).get(m.get_source());
+			l.add(m);
+			if(l.size() >  cacheSize){
+				l.remove(0);
+			}
+		}
+		else{
+			List<TimeStampedMessage> newList = new LinkedList<TimeStampedMessage>();
+			newList.add(m);
+			caches.get(m.getGroupName()).put(m.get_source(), newList);
 		}
 	}
 
+	public void initCache() {
+		// init cache
+		for(String groupName: delivered.keySet()){
+			caches.put(groupName, new HashMap<String, List<TimeStampedMessage>>());
+		}
+	}
+	
+	public void initHoldBackQueue(){
+		// init holdBackqueue
+		for(String groupName: delivered.keySet()){
+			holdBackQueues.put(groupName, new HashMap<String, List<TimeStampedMessage>>());
+		}
+	}
 }
