@@ -56,7 +56,8 @@ public class MulticastService {
 			throws FileNotFoundException {
 		int selfGroupSeqNum = this.gSeqNum.get(groupName);
 
-		for (String targetNode : delivered.keySet()) {
+		for (String targetNode : delivered.get(groupName).keySet()) {
+			System.out.println("O:" +  targetNode);
 			TimeStampedMessage tm = new TimeStampedMessage(m);
 			tm.addGroupSeqNum(selfGroupSeqNum);
 			tm.addACKs(delivered.get(groupName));
