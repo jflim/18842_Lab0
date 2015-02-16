@@ -44,7 +44,12 @@ public class WorkThread implements Runnable{
 						logs.add(processedMessage);
 						System.out.println("logging message!");
 					}
- 
+                    // multicast message
+                    else if(processedMessage.getGroupSeqNum() != -1){
+                        messagePasser.multicastService.receive_multicast(processedMessage.getGroupName(), processedMessage);
+
+                    }
+                    //normal message
 					else {
 						
 						// adjust clock

@@ -14,7 +14,7 @@ public class TimeStampedMessage extends Message implements Serializable{
     private String groupName = null;
     
     // Multicast services
-    private int groupSeqNum;
+    private int groupSeqNum = -1;
     private Map<String, Integer> ACKs;
     boolean NACK;
     
