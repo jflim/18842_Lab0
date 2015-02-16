@@ -72,6 +72,10 @@ public class TimeStampedMessage extends Message implements Serializable{
     	this.ACKs = R;
     }
     
+    public void setNACK(boolean value){
+    	NACK = value;
+    }
+    
     /* getters    */
     
     public String getGroupName(){

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -20,7 +21,11 @@ public class MulticastService {
 	Map<String, HashMap<String, Integer>> delivered; // Group for each <member,
 													// delivered>
 	Map<String, HashMap<String, List<TimeStampedMessage>>> holdBackQueues;
+	Map<String, HashMap<String, List<TimeStampedMessage>>> caches;
 	MessagePasser mp;
+	
+	// cachesize 
+	int cacheSize = 3;
 
 	public MulticastService(MessagePasser mp) {
 
@@ -66,6 +71,7 @@ public class MulticastService {
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
 		int R_for_sender = groupDelivers.get(m.get_source());
+		String missingSender; // sender whose message was missed. 
 
 		// decide what to do now
 		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
@@ -79,14 +85,18 @@ public class MulticastService {
 		} else if (m.getGroupSeqNum() > R_for_sender) { // not delivered and not
 														// next
 			insertInHoldBackQueue(groupName, m);
-		} else if (seenMissingMessage(groupName, m.getACKS()) == true) {
+		}
+		
+		missingSender = seenMissingMessage(groupName, m.getACKS());
+		if(missingSender != null){
 			try {
 				 // request missed packet from someone
-				sendNACK(m.getGroupSeqNum(), groupName);
+				sendNACK(m.getGroupSeqNum(), groupName, missingSender);
 			} catch (FileNotFoundException e) {
 				//e.printStackTrace();
 			}
 		}
+
 	}
 
 	/**
@@ -117,25 +127,27 @@ public class MulticastService {
 	 * @param acks
 	 * @return
 	 */
-	private boolean seenMissingMessage(String groupName, Map<String, Integer> acks) {
+	private String seenMissingMessage(String groupName, Map<String, Integer> acks) {
 		for(Entry<String, Integer> ack: acks.entrySet()){
 			if(ack.getValue() > delivered.get(groupName).get(ack.getKey())){
-				return true;
+				return ack.getKey();
 			}
 		}
-		return false;
+		return null;
 	}
 
-	private void sendNACK(int groupSeqNum, String groupName)
+	private void sendNACK(int groupSeqNum, String groupName, String missingSender)
 			throws FileNotFoundException {
-		// send a NACK to everyone in your group.
-		for (String targetNode : delivered.get(groupName).keySet()) {
-
-			Message m = new Message(targetNode, "NACK", groupSeqNum);
+		// determine which nodes had delivered the message already
+		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
+			if(node.getValue() >= groupSeqNum){
+				String request =  missingSender + "|" + groupSeqNum;
+			Message m = new Message(node.getKey(), "NACK", request);
 			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
+			t.setNACK(true);
 			mp.send(t);
+			}
 		}
-
 	}
 
 	private void handleHoldBackQueue(String groupName, String src) {
@@ -158,11 +170,15 @@ public class MulticastService {
 
 	}
 
-	
+	/**
+	 * Handles incoming NACKs with the request missed message in the data section
+	 * @param m
+	 */
 	public void handleNACK(TimeStampedMessage m){
 		TimeStampedMessage cachedMessage = checkCache(m.getGroupName(), m.getData());
 		if(cachedMessage == null){
-			System.err.println("Message from Group " + m.getGroupName() + ", Group Seq Num " + m.getData() + "not stored in cache");
+			System.err.println("Message from Group " + m.getGroupName()
+					+ ", RequestData " + m.getData() + "not stored in cache");
 		}
 		else{
 			try {
@@ -175,12 +191,27 @@ public class MulticastService {
 	}
 	
 	private TimeStampedMessage checkCache(String groupName, String data) {
-		// TODO Auto-generated method stub
+		String[] tmp = data.split("|");
+		String origSrc = tmp[0];
+		int requestMessageSeqNum = Integer.parseInt(tmp[1]);
+		Iterator<TimeStampedMessage> li = caches.get(groupName).get(origSrc).iterator();
+		while(li.hasNext()){
+			TimeStampedMessage mess = li.next();
+			if(mess.getGroupSeqNum() == requestMessageSeqNum){
+				return mess;
+			}
+		}
+		
 		return null;
 	}
 
 	private void deliver(TimeStampedMessage m) {
 		System.out.println("Unimplemented yet. Delivering Message to app ");
+		List<TimeStampedMessage> l =  caches.get(m.getGroupName()).get(m.get_source());
+		l.add(m);
+		if(l.size() >  cacheSize){
+			l.remove(0);
+		}
 	}
 
 }
