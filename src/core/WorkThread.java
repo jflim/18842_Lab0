@@ -66,11 +66,11 @@ public class WorkThread implements Runnable{
                         }
 						
 						// log message
-						System.out.println("Do you want to log this message? Y: N");
-						String line = scan.nextLine();
-						if (line.equalsIgnoreCase("Y")) {
-							sendMessageToLogger(processedMessage);
-						}
+						//System.out.println("Do you want to log this message? Y: N");
+						//String line = scan.nextLine();
+						//if (line.equalsIgnoreCase("Y")) {
+						//	sendMessageToLogger(processedMessage);
+						//}
 
 
 
@@ -80,6 +80,7 @@ public class WorkThread implements Runnable{
 				}
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 
 			try {
 				input.close();

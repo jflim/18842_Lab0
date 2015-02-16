@@ -29,11 +29,14 @@ public class TimeStampedMessage extends Message implements Serializable{
         super(message);
         this.timeStamp = message.timeStamp.copy();
         this.groupName = message.groupName;
+        this.groupSeqNum = message.groupSeqNum;
+        this.NACK = message.NACK;
     }
 
     public TimeStampedMessage(Message message, ClockService timeStamp) {
         super(message);
         this.timeStamp = timeStamp.copy();
+        
 
     }
 
@@ -78,6 +81,10 @@ public class TimeStampedMessage extends Message implements Serializable{
     }
     
     /* getters    */
+    
+    public boolean getNACK(){
+    	return NACK;
+    }
     
     public String getGroupName(){
     	return this.groupName;

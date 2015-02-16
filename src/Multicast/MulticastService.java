@@ -73,6 +73,14 @@ public class MulticastService {
 	}
 
 	public void receive_multicast(String groupName, TimeStampedMessage m) {
+		System.out.println("In receive_multicast");
+		System.out.println(m.getGroupSeqNum());
+		
+		
+		if(m.getNACK() == true){
+			handleNACK(m);
+			return;
+		}
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
 		int R_for_sender = groupDelivers.get(m.get_source());
@@ -93,12 +101,13 @@ public class MulticastService {
 		}
 		
 		missingSender = seenMissingMessage(groupName, m.getACKS());
+		System.out.println(missingSender);
 		if(missingSender != null){
 			try {
 				 // request missed packet from someone
 				sendNACK(m.getGroupSeqNum(), groupName, missingSender);
 			} catch (FileNotFoundException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
@@ -150,16 +159,17 @@ public class MulticastService {
 		return null;
 	}
 
-	private void sendNACK(int groupSeqNum, String groupName, String missingSender)
-			throws FileNotFoundException {
+	private void sendNACK(int groupSeqNum, String groupName,
+			String missingSender) throws FileNotFoundException {
+		System.out.println("Sending a NACK");
 		// determine which nodes had delivered the message already
 		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
-			if(node.getValue() >= groupSeqNum){
-				String request =  missingSender + "|" + groupSeqNum;
-			Message m = new Message(node.getKey(), "NACK", request);
-			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
-			t.setNACK(true);
-			mp.send(t);
+			if (node.getValue() >= groupSeqNum) {
+				String request = missingSender + ":::" + groupSeqNum;
+				Message m = new Message(node.getKey(), "NACK", request);
+				TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
+				t.setNACK(true);
+				mp.send(t);
 			}
 		}
 	}
@@ -196,6 +206,7 @@ public class MulticastService {
 	 * @param m
 	 */
 	public void handleNACK(TimeStampedMessage m){
+		System.out.println("Handling a NACK");
 		TimeStampedMessage cachedMessage = checkCache(m.getGroupName(), m.getData());
 		if(cachedMessage == null){
 			System.err.println("Message from Group " + m.getGroupName()
@@ -212,7 +223,7 @@ public class MulticastService {
 	}
 	
 	private TimeStampedMessage checkCache(String groupName, String data) {
-		String[] tmp = data.split("|");
+		String[] tmp = data.split(":::");
 		String origSrc = tmp[0];
 		int requestMessageSeqNum = Integer.parseInt(tmp[1]);
 		Iterator<TimeStampedMessage> li = caches.get(groupName).get(origSrc).iterator();
@@ -230,10 +241,11 @@ public class MulticastService {
 		System.out.println("Data: " + m.getData()
 				+ " Kind: " + m.getKind()
 				+ " SeqNum: " + m.getSeqNum()
-				+ " Duplicate: " + m.getDup()
+				+ " Dup: " + m.getDup()
 				+ " Timestamp: " + m.getTimeStamp()    
-				+ " Group Name: " + m.getGroupName()
-				+ " Group Seq Num: "  + m.getGroupSeqNum());
+				+ "\nGroup Name: " + m.getGroupName()
+				+ ", Src: " + m.get_source() 
+				+ "\nGroup Sequence Number: "  + m.getGroupSeqNum());
 		
 		
 		if(caches.get(m.getGroupName()).containsKey(m.get_source())){

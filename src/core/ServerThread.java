@@ -30,7 +30,6 @@ public class ServerThread implements Runnable{
             while (true) {
                 socket = serverSocket.accept();
 
-            	System.out.println("received conn");
                 Thread thread = new Thread(new WorkThread(socket, messagePasser, isLogger, logs));
                 thread.start();
             }
