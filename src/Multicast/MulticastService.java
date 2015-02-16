@@ -43,7 +43,7 @@ public class MulticastService {
 	 * 
 	 * @param g
 	 */
-	void addGroup(Group g) {
+	public void addGroup(Group g) {
 		gSeqNum.put(g.getName(), 0);
 		HashMap<String, Integer> deliverGroup = new HashMap<String, Integer>();
 		for (String memberName : g.memberNames()) {
@@ -52,7 +52,7 @@ public class MulticastService {
 		delivered.put(g.getName(), deliverGroup);
 	}
 
-	void send_multicast(String groupName, TimeStampedMessage m)
+	public void send_multicast(String groupName, TimeStampedMessage m)
 			throws FileNotFoundException {
 		int selfGroupSeqNum = this.gSeqNum.get(groupName);
 
