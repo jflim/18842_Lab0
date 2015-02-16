@@ -16,6 +16,7 @@ public class TimeStampedMessage extends Message implements Serializable{
     // Multicast services
     private int groupSeqNum;
     private Map<String, Integer> ACKs;
+    boolean NACK;
     
 	public TimeStampedMessage(String dest, String kind, Object data,
 			ClockService timeStamp) {
@@ -59,6 +60,10 @@ public class TimeStampedMessage extends Message implements Serializable{
         return this.timeStamp;
     }
     
+    public void setGroupName(String groupName){
+    	this.groupName = groupName;
+    }
+    
     public void addGroupSeqNum(int gsn){
     	this.groupSeqNum = gsn;
     }
@@ -68,6 +73,10 @@ public class TimeStampedMessage extends Message implements Serializable{
     }
     
     /* getters    */
+    
+    public String getGroupName(){
+    	return this.groupName;
+    }
     
     public int getGroupSeqNum(){
     	return this.groupSeqNum;
