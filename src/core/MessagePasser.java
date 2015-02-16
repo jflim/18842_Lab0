@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import Clock.ClockService;
 
+import Multicast.MulticastService;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -41,6 +42,7 @@ public class MessagePasser {
     private boolean isProcessedRules = false;
     private ClockService clock = null;
     private HashMap<String, Group> groups;
+    public MulticastService multicastService;
     // node configuration
     Map<String, Node> nodes;
 
@@ -83,7 +85,10 @@ public class MessagePasser {
         // logger variables
         this.isLogger = isLogger;
         this.logs = logs;
-        
+        //multicast service
+        this.multicastService = new MulticastService(this);
+
+
         try {
             parseConfig();
 
@@ -133,14 +138,15 @@ public class MessagePasser {
 			}
 			clock = ClockService.newClock(isLogical, local_index, nodes.size());
 		}
-
+        //set up groups
         if (m.containsKey("groups")) {
             ArrayList<LinkedHashMap<String, Object>> groupsList = m.get("groups");
             for (LinkedHashMap<String, Object> group : groupsList) {
                 String groupName = (String) group.get("name");
                 ArrayList<String> members = (ArrayList<String>) group.get("members");
                 Group tmp = new Group(groupName, members, nodes, clock.copy());
-
+                if(members.contains(local_name))
+                    multicastService.addGroup(tmp);
                 groups.put(groupName, tmp);
             }
 
