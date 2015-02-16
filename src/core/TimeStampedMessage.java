@@ -110,4 +110,8 @@ public class TimeStampedMessage extends Message implements Serializable{
         return this.dest;
     }
 	
+    public String getKind() { 
+    	return this.kind;
+    }
+   
 }

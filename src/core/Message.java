@@ -22,6 +22,7 @@ public class Message implements Serializable {
         this.dup = message.dup; //default value
         this.data = message.data;
         this.seqNum = message.seqNum;
+        this.src = message.src;
     }
 	// These setters are used by MessagePasser.send, not the app
 	public void set_source(String source) {

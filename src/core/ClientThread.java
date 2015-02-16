@@ -87,6 +87,7 @@ public class ClientThread implements Runnable {
 				try {
 					m.set_source(messagePasser.local_name);
 					m.set_seqNum(messagePasser.seqNum++);
+					System.out.println(m.get_source());
 					messagePasser.multicastService.send_multicast(groupName, m);
 
 					System.out.println("Do you want to log this message? Y: N");// log

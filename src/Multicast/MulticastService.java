@@ -59,6 +59,7 @@ public class MulticastService {
 		for (String targetNode : delivered.get(groupName).keySet()) {
 			System.out.println("O:" +  targetNode);
 			TimeStampedMessage tm = new TimeStampedMessage(m);
+			System.out.println("print tm source" + tm.get_source());
 			tm.addGroupSeqNum(selfGroupSeqNum);
 			tm.addACKs(delivered.get(groupName));
 
@@ -71,6 +72,9 @@ public class MulticastService {
 	public void receive_multicast(String groupName, TimeStampedMessage m) {
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
+		System.out.println(m.get_source());
+		System.out.println(m.get_dst());
+		System.out.println(m.getData());
 		int R_for_sender = groupDelivers.get(m.get_source());
 		String missingSender; // sender whose message was missed. 
 
@@ -207,7 +211,13 @@ public class MulticastService {
 	}
 
 	private void deliver(TimeStampedMessage m) {
-		System.out.println("Unimplemented yet. Delivering Message to app ");
+		System.out.println("Data: " + m.getData()
+				+ " Kind: " + m.getKind()
+				+ " SeqNum: " + m.getSeqNum()
+				+ " Duplicate: " + m.getDup()
+				+ " Timestamp: " + m.getTimeStamp()    
+				+ " Group Name: " + m.getGroupName()
+				+ " Group Seq Num: "  + m.getGroupSeqNum());
 		List<TimeStampedMessage> l =  caches.get(m.getGroupName()).get(m.get_source());
 		l.add(m);
 		if(l.size() >  cacheSize){

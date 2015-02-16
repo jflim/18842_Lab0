@@ -52,11 +52,18 @@ public class WorkThread implements Runnable{
 						messagePasser.getClock().setClock(
 								processedMessage.getTimeStamp());
 						
+						// if this is a multicast message
+                        if(processedMessage.getGroupSeqNum() != -1){
+                            messagePasser.multicastService.receive_multicast(processedMessage.getGroupName(), processedMessage);
+
+                        }
+                        else{
 						System.out.println("Data: " + processedMessage.data
 								+ " SeqNum: " + processedMessage.seqNum
 								+ " Duplicate: " + processedMessage.dup
 								+ " Timestamp: "
 								+ processedMessage.getTimeStamp());
+                        }
 						
 						// log message
 						System.out.println("Do you want to log this message? Y: N");
@@ -64,10 +71,7 @@ public class WorkThread implements Runnable{
 						if (line.equalsIgnoreCase("Y")) {
 							sendMessageToLogger(processedMessage);
 						}
-                        if(processedMessage.getGroupSeqNum() != -1){
-                            messagePasser.multicastService.receive_multicast(processedMessage.getGroupName(), processedMessage);
 
-                        }
 
 
 					}
