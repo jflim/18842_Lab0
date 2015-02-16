@@ -73,8 +73,8 @@ public class MulticastService {
 	}
 
 	public void receive_multicast(String groupName, TimeStampedMessage m) {
-		System.out.println("In receive_multicast");
-		System.out.println(m.getGroupSeqNum());
+		//System.out.println("In receive_multicast");
+		//System.out.println(m.getGroupSeqNum());
 		
 		if(m.getNACK() == true){
 			handleNACK(m);
@@ -100,7 +100,7 @@ public class MulticastService {
 		}
 		
 		missingSender = seenMissingMessage(groupName, m.getACKS());
-		System.out.println(missingSender);
+		//System.out.println(missingSender);
 		if(missingSender != null){
 			try {
 				 // request missed packet from someone
@@ -160,7 +160,6 @@ public class MulticastService {
 
 	private void sendNACK(int groupSeqNum, String groupName,
 			String missingSender) throws FileNotFoundException {
-		System.out.println("Sending a NACK");
 		// determine which nodes had delivered the message already
 		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
 			if (node.getValue() >= groupSeqNum) {
@@ -174,7 +173,10 @@ public class MulticastService {
 				
 				// set regular fields
 				t.set_source(mp.getLocalName());
-				t.set_seqNum(mp.incSequenceNumber());
+				t.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
+				
+				System.out.println("Sending a NACK to " + node.getKey()
+						+ " for: " + groupSeqNum + "from " + missingSender);
 				mp.send(t);
 			}
 		}
@@ -212,7 +214,7 @@ public class MulticastService {
 	 * @param m
 	 */
 	public void handleNACK(TimeStampedMessage m){
-		System.out.println("Handling a NACK");
+		System.out.println("Handling a NACK from " + m.get_source());
 		TimeStampedMessage cachedMessage = checkCache(m.getGroupName(), m.getData());
 		if(cachedMessage == null){
 			System.err.println("Message from Group " + m.getGroupName()

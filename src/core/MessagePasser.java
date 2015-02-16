@@ -379,6 +379,7 @@ public class MessagePasser {
 
         // Add TimeStamp to Message
     	this.getClock().clockIncrement(); // clock increment before sending
+    	message.setTimeStamp(this.getClock());
  
     	getSendRules();
         checkSendRules(message);
@@ -414,8 +415,7 @@ public class MessagePasser {
                 this.addConnectionStreams(input, output);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-            	System.out.println("DAMN");
-                e.printStackTrace();
+            	e.printStackTrace();
             }
 
         }

@@ -64,6 +64,10 @@ public class TimeStampedMessage extends Message implements Serializable{
         return this.timeStamp;
     }
     
+    public void setTimeStamp(ClockService ts){
+    	this.timeStamp = ts.copy();
+    }
+    
     public void setGroupName(String groupName){
     	this.groupName = groupName;
     }
