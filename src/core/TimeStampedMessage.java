@@ -73,6 +73,10 @@ public class TimeStampedMessage extends Message implements Serializable{
     	return this.groupSeqNum;
     }
     
+    public Map<String, Integer> getACKS(){
+    	return this.ACKs;
+    }
+    
 	public String getData() {
 		return (String) this.data;
 	}
