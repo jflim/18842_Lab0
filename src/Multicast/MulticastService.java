@@ -62,7 +62,7 @@ public class MulticastService {
 		}
 	}
 
-	void receive_multicast(String groupName, TimeStampedMessage m) {
+	public void receive_multicast(String groupName, TimeStampedMessage m) {
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
 		int R_for_sender = groupDelivers.get(m.get_source());
