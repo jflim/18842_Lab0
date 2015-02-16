@@ -414,6 +414,7 @@ public class MessagePasser {
                 this.addConnectionStreams(input, output);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
+            	System.out.println("DAMN");
                 e.printStackTrace();
             }
 
@@ -471,6 +472,7 @@ public class MessagePasser {
             output = outputStreams.get(targetName);
             try {
                 output.writeObject(message);
+                output.reset();
             } catch (IOException e) {
                 // assume the connection is dead.
                 System.err.println("Connection refused. Check the receiving side.");
@@ -613,8 +615,17 @@ public class MessagePasser {
     }
 
 
+    public String getLocalName(){
+    	return this.local_name;
+    }
+    
 	public void sendMessageToLogger(TimeStampedMessage processedMessage) {
 		boolean toLogger = true;
     	sendMessage(processedMessage, toLogger);	
+	}
+	
+	public int incSequenceNumber(){
+		this.seqNum++;
+		return this.seqNum;
 	}
 }

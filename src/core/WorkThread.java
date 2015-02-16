@@ -53,7 +53,7 @@ public class WorkThread implements Runnable{
 								processedMessage.getTimeStamp());
 						
 						// if this is a multicast message
-                        if(processedMessage.getGroupSeqNum() != -1){
+                        if(processedMessage.getGroupSeqNum() != -1 || processedMessage.getNACK() == true){
                             messagePasser.multicastService.receive_multicast(processedMessage.getGroupName(), processedMessage);
 
                         }
@@ -72,8 +72,6 @@ public class WorkThread implements Runnable{
 						//	sendMessageToLogger(processedMessage);
 						//}
 
-
-
 					}
 					processedMessage = this.messagePasser.receiveMessage();
 
@@ -82,14 +80,14 @@ public class WorkThread implements Runnable{
 		} catch (IOException e) {
 			e.printStackTrace();
 
-			try {
-				input.close();
-				String socketName = messagePasser.removeInputStream(input);
-				messagePasser.removeSocket(socketName);
-				return;
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			//try {
+			//	input.close();
+			//	String socketName = messagePasser.removeInputStream(input);
+			//	messagePasser.removeSocket(socketName);
+			//	return;
+			//} catch (IOException e1) {
+			//	e1.printStackTrace();
+			//}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

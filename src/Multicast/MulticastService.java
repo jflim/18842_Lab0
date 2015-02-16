@@ -76,7 +76,6 @@ public class MulticastService {
 		System.out.println("In receive_multicast");
 		System.out.println(m.getGroupSeqNum());
 		
-		
 		if(m.getNACK() == true){
 			handleNACK(m);
 			return;
@@ -168,7 +167,14 @@ public class MulticastService {
 				String request = missingSender + ":::" + groupSeqNum;
 				Message m = new Message(node.getKey(), "NACK", request);
 				TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
+				
+				// set Multicast fields
 				t.setNACK(true);
+				t.setGroupName(groupName);
+				
+				// set regular fields
+				t.set_source(mp.getLocalName());
+				t.set_seqNum(mp.incSequenceNumber());
 				mp.send(t);
 			}
 		}
@@ -214,6 +220,7 @@ public class MulticastService {
 		}
 		else{
 			try {
+				cachedMessage.set_dst(m.get_source());
 				mp.send(cachedMessage);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
