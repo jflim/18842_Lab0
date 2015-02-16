@@ -4,13 +4,13 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import core.Group;
+import core.Message;
 import core.MessagePasser;
 import core.TimeStampedMessage;
 
@@ -76,14 +76,17 @@ public class MulticastService {
 		} else if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
 															// duplicate
 			return;
-		}else if(m.getGroupSeqNum() > R_for_sender){ //not delivered and not next
-			insertInHoldBackQueue(groupName, m);	
+		} else if (m.getGroupSeqNum() > R_for_sender) { // not delivered and not
+														// next
+			insertInHoldBackQueue(groupName, m);
+		} else if (seenMissingMessage(groupName, m.getACKS()) == true) {
+			try {
+				 // request missed packet from someone
+				sendNACK(m.getGroupSeqNum(), groupName);
+			} catch (FileNotFoundException e) {
+				//e.printStackTrace();
+			}
 		}
-		 else if(seenMissingMessage(groupName, m.getACKS()) == true){
-			sendNACK(m.getGroupSeqNum(), groupName); // request missed packet from this sender
-		}
-
-		
 	}
 
 	/**
@@ -123,9 +126,16 @@ public class MulticastService {
 		return false;
 	}
 
-	private void sendNACK(int groupSeqNum, String groupName) {
-		// TODO Auto-generated method stub
-		
+	private void sendNACK(int groupSeqNum, String groupName)
+			throws FileNotFoundException {
+		// send a NACK to everyone in your group.
+		for (String targetNode : delivered.get(groupName).keySet()) {
+
+			Message m = new Message(targetNode, "NACK", groupSeqNum);
+			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
+			mp.send(t);
+		}
+
 	}
 
 	private void handleHoldBackQueue(String groupName, String src) {
@@ -138,11 +148,35 @@ public class MulticastService {
 				groupDelivers.put(src, groupDelivers.get(src) +1);
 				deliver(tm);
 			}
+			else if(tm.getGroupSeqNum() <= groupDelivers.get(src)){
+				continue; // if we somehow had a duplicate..
+			}
 			else{
 				break; // no more expected
 			}
 		}
 
+	}
+
+	
+	public void handleNACK(TimeStampedMessage m){
+		TimeStampedMessage cachedMessage = checkCache(m.getGroupName(), m.getData());
+		if(cachedMessage == null){
+			System.err.println("Message from Group " + m.getGroupName() + ", Group Seq Num " + m.getData() + "not stored in cache");
+		}
+		else{
+			try {
+				mp.send(cachedMessage);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private TimeStampedMessage checkCache(String groupName, String data) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private void deliver(TimeStampedMessage m) {
