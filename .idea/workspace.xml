@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6fe5d049-6d67-4702-ab18-6922954ac62c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/core/Group.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/ClientThread.java" afterPath="$PROJECT_DIR$/src/core/ClientThread.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/MessagePasser.java" afterPath="$PROJECT_DIR$/src/core/MessagePasser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/TimeStampedMessage.java" afterPath="$PROJECT_DIR$/src/core/TimeStampedMessage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="6fe5d049-6d67-4702-ab18-6922954ac62c" name="Default" comment="" />
     <ignored path="18842_Lab0.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -37,17 +31,17 @@
       <file leaf-file-name="ClockService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Clock/ClockService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="495">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="594">
               <caret line="9" column="34" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VectorClock.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="VectorClock.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Clock/VectorClock.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.7005814" vertical-offset="0" max-vertical-offset="2040">
+            <state vertical-scroll-proportion="0.0" vertical-offset="702" max-vertical-offset="2448">
               <caret line="45" column="0" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
               <folding />
             </state>
@@ -57,8 +51,8 @@
       <file leaf-file-name="ClientThread.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/ClientThread.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1299" max-vertical-offset="2040">
-              <caret line="81" column="32" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1171" max-vertical-offset="2448">
+              <caret line="101" column="40" selection-start-line="101" selection-start-column="38" selection-end-line="101" selection-end-column="42" />
               <folding />
             </state>
           </provider>
@@ -67,7 +61,7 @@
       <file leaf-file-name="Logger.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Logger/Logger.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1455">
+            <state vertical-scroll-proportion="0.0" vertical-offset="396" max-vertical-offset="1854">
               <caret line="22" column="50" selection-start-line="22" selection-start-column="50" selection-end-line="22" selection-end-column="50" />
               <folding />
             </state>
@@ -77,9 +71,39 @@
       <file leaf-file-name="MessagePasser.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/MessagePasser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1705" max-vertical-offset="9000">
-              <caret line="142" column="0" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
-              <folding />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2645" max-vertical-offset="4968">
+              <caret line="369" column="16" selection-start-line="369" selection-start-column="16" selection-end-line="369" selection-end-column="16" />
+              <folding>
+                <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+                <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+                <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MulticastService.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Multicast/MulticastService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.72" vertical-offset="0" max-vertical-offset="1332">
+              <caret line="48" column="45" selection-start-line="48" selection-start-column="45" selection-end-line="48" selection-end-column="45" />
+              <folding>
+                <element signature="e#998#1015#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -87,20 +111,8 @@
       <file leaf-file-name="Group.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Group.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="180" max-vertical-offset="600">
+            <state vertical-scroll-proportion="0.0" vertical-offset="486" max-vertical-offset="1026">
               <caret line="27" column="44" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="44" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WorkThread.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/core/WorkThread.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="780" max-vertical-offset="1455">
-              <caret line="52" column="24" selection-start-line="52" selection-start-column="24" selection-end-line="52" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -109,11 +121,9 @@
       <file leaf-file-name="TimeStampedMessage.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/TimeStampedMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="960">
-              <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
-              <folding>
-                <element signature="e#108#135#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="630" max-vertical-offset="1836">
+              <caret line="35" column="5" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -121,7 +131,7 @@
       <file leaf-file-name="Message.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Message.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="390" max-vertical-offset="750">
+            <state vertical-scroll-proportion="0.0" vertical-offset="468" max-vertical-offset="900">
               <caret line="26" column="22" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
               <folding />
             </state>
@@ -131,7 +141,7 @@
       <file leaf-file-name="Main.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
+            <state vertical-scroll-proportion="0.0" vertical-offset="36" max-vertical-offset="558">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
               <folding />
             </state>
@@ -178,10 +188,10 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="64" />
+    <option name="x" value="1430" />
     <option name="y" value="-4" />
-    <option name="width" value="1303" />
-    <option name="height" value="773" />
+    <option name="width" value="1857" />
+    <option name="height" value="1205" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -210,6 +220,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -229,6 +240,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="18842_Lab0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="18842_Lab0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="18842_Lab0" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Multicast" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -288,7 +317,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -350,19 +378,6 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -388,6 +403,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -565,7 +593,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-4" width="1303" height="773" extended-state="6" />
+    <frame x="1430" y="-4" width="1857" height="1205" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -574,24 +602,24 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2494043" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39816234" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39800543" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962668" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2494043" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.249309" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30015314" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32618684" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32924962" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -632,7 +660,7 @@
           <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="10" />
+      <option name="time" value="11" />
     </breakpoint-manager>
   </component>
   <component name="antWorkspaceConfiguration">
@@ -640,21 +668,11 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/core/WorkThread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="780" max-vertical-offset="1455">
-          <caret line="52" column="24" selection-start-line="52" selection-start-column="24" selection-end-line="52" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/TimeStampedMessage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="960" max-vertical-offset="1140">
           <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -710,7 +728,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="5400" max-vertical-offset="8940">
           <caret line="360" column="0" selection-start-line="360" selection-start-column="0" selection-end-line="360" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -718,7 +754,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="495" max-vertical-offset="765">
           <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -734,9 +769,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="390" max-vertical-offset="1005">
           <caret line="26" column="41" selection-start-line="26" selection-start-column="41" selection-end-line="26" selection-end-column="41" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -784,7 +817,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="5400" max-vertical-offset="8940">
           <caret line="360" column="0" selection-start-line="360" selection-start-column="0" selection-end-line="360" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -792,7 +843,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="495" max-vertical-offset="765">
           <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -808,9 +858,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="1005">
           <caret line="34" column="0" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -850,7 +898,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="5400" max-vertical-offset="8940">
           <caret line="360" column="0" selection-start-line="360" selection-start-column="0" selection-end-line="360" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -858,7 +924,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="495" max-vertical-offset="765">
           <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -874,9 +939,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="180" max-vertical-offset="1005">
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -916,7 +979,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="8850">
           <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -924,9 +1005,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="315" max-vertical-offset="1110">
           <caret line="21" column="5" selection-start-line="21" selection-start-column="5" selection-end-line="21" selection-end-column="5" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -973,7 +1052,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="705">
           <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1011,18 +1089,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/core/TimeStampedMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="960">
-          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
-          <folding>
-            <element signature="e#108#135#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/ClientThread.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="984" max-vertical-offset="2040">
-          <caret line="81" column="32" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="630" max-vertical-offset="1836">
+          <caret line="35" column="5" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
           <folding />
         </state>
       </provider>
@@ -1031,16 +1099,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="180" max-vertical-offset="600">
           <caret line="27" column="44" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="44" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/MessagePasser.java">
+    <entry file="file://$PROJECT_DIR$/src/Clock/VectorClock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1795" max-vertical-offset="9000">
-          <caret line="142" column="0" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="702" max-vertical-offset="2448">
+          <caret line="45" column="0" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1053,11 +1119,47 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Clock/VectorClock.java">
+    <entry file="file://$PROJECT_DIR$/src/core/ClientThread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.7005814" vertical-offset="0" max-vertical-offset="2040">
-          <caret line="45" column="0" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1171" max-vertical-offset="2448">
+          <caret line="101" column="40" selection-start-line="101" selection-start-column="38" selection-end-line="101" selection-end-column="42" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/MessagePasser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2645" max-vertical-offset="4968">
+          <caret line="369" column="16" selection-start-line="369" selection-start-column="16" selection-end-line="369" selection-end-column="16" />
+          <folding>
+            <element signature="method#parseConfig#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#getReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#parseNodes#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkSendRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkReceiveRules#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#checkRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processSendRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#processReceiveRule#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#send#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#incrementClock#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#serverSetUp#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessage#1;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeOutputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeInputStream#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#removeSocket#0;class#MessagePasser#0" expanded="false" />
+            <element signature="method#sendMessageToLogger#0;class#MessagePasser#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Multicast/MulticastService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.72" vertical-offset="0" max-vertical-offset="1332">
+          <caret line="48" column="45" selection-start-line="48" selection-start-column="45" selection-end-line="48" selection-end-column="45" />
+          <folding>
+            <element signature="e#998#1015#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
