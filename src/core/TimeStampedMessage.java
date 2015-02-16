@@ -2,6 +2,7 @@ package core;
 import Clock.ClockService;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by gs on 2/6/15.
@@ -11,6 +12,11 @@ public class TimeStampedMessage extends Message implements Serializable{
 
     private ClockService timeStamp;
     private String groupName = null;
+    
+    // Multicast services
+    private int groupSeqNum;
+    private Map<String, Integer> ACKs;
+    
 	public TimeStampedMessage(String dest, String kind, Object data,
 			ClockService timeStamp) {
 		super(dest, kind, data);
@@ -53,7 +59,19 @@ public class TimeStampedMessage extends Message implements Serializable{
         return this.timeStamp;
     }
     
+    public void addGroupSeqNum(int gsn){
+    	this.groupSeqNum = gsn;
+    }
+    
+    public void addACKs(Map<String, Integer> R){
+    	this.ACKs = R;
+    }
+    
     /* getters    */
+    
+    public int getGroupSeqNum(){
+    	return this.groupSeqNum;
+    }
     
 	public String getData() {
 		return (String) this.data;
