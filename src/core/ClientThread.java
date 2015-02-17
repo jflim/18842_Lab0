@@ -78,6 +78,8 @@ public class ClientThread implements Runnable {
 				}
 				String kind = tmpline[1];
 				String groupName = tmpline[2];
+                if(!messagePasser.getGroups().containsKey(groupName))
+                    continue;
 
 				System.out.println("Enter the message content: ");
 				String content = scan.nextLine();
@@ -89,13 +91,13 @@ public class ClientThread implements Runnable {
 					m.set_seqNum(messagePasser.seqNum++);
 					System.out.println(m.get_source());
 					messagePasser.multicastService.send_multicast(groupName, m);
-
-					System.out.println("Do you want to log this message? Y: N");// log
-					// message
-					line = scan.nextLine();
-					if (line.equalsIgnoreCase("Y")) {
-						messagePasser.sendMessageToLogger(m);
-					}
+//
+//					System.out.println("Do you want to log this message? Y: N");// log
+//					// message
+//					line = scan.nextLine();
+//					if (line.equalsIgnoreCase("Y")) {
+//						messagePasser.sendMessageToLogger(m);
+//					}
 
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -121,7 +123,6 @@ public class ClientThread implements Runnable {
 		System.out.println("exit -exit the program");
 		System.out.println("time -display the current timestamps");
 		System.out.println("generate -increment timestamp and display");
-		System.out
-				.println("multicast [kind] [group] -multicast a message to a group");
+		System.out.println("multicast [kind] [group] -multicast a message to a group");
 	}
 }

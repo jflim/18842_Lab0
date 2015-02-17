@@ -225,7 +225,16 @@ public class MessagePasser {
             return;
         }
         isProcessedRules = false;
-        System.out.println("Send: " + message.data + " to " + message.dest + " Seqnum: " + message.seqNum + " Timestamp: " + message.getTimeStamp());
+        //System.out.println("Send: " + message.data + " to " + message.dest + " Seqnum: " + message.seqNum + " Timestamp: " + message.getTimeStamp());
+        System.out.println("Send: " + message.getData()
+                + " Kind: " + message.getKind()
+                + " SeqNum: " + message.getSeqNum()
+                + " Dup: " + message.getDup()
+                + " Timestamp: " + message.getTimeStamp()
+                + "\nGroupName: " + message.getGroupName()
+                + ", Src: " + message.get_source()
+                + " GroupSeqNum: "  + message.getGroupSeqNum() + "\n");
+
         for (LinkedHashMap<String, Object> rule : sendRules) {
             if (checkRule(message, rule)) {
                 processSendRule((String) rule.get("action"), message);
@@ -352,6 +361,14 @@ public class MessagePasser {
     public synchronized void processReceiveRule(String action, TimeStampedMessage message) {
         if (action.equals("drop")) {
             System.out.println("Drop");
+           /* System.out.println("Data: " + message.getData()
+                    + " Kind: " + message.getKind()
+                    + " SeqNum: " + message.getSeqNum()
+                    + " Dup: " + message.getDup()
+                    + " Timestamp: " + message.getTimeStamp()
+                    + "\nGroupName: " + message.getGroupName()
+                    + ", Src: " + message.get_source()
+                    + " GroupSeqNum: "  + message.getGroupSeqNum() + "\n");*/
             message = null;
             return;
         } else if (action.equals("delay")) { // 1 delayed message
@@ -628,4 +645,8 @@ public class MessagePasser {
 		this.seqNum++;
 		return this.seqNum;
 	}
+
+    public HashMap<String, Group> getGroups(){
+        return this.groups;
+    }
 }
