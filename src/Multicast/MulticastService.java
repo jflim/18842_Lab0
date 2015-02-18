@@ -224,6 +224,7 @@ public class MulticastService {
 			try {
 				cachedMessage.set_dst(m.get_source());
                 cachedMessage.set_source(mp.getLocalName());
+
 				mp.send(cachedMessage);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
