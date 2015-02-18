@@ -175,7 +175,7 @@ public class MulticastService {
 				t.setGroupName(groupName);
 				
 				// set regular fields
-				t.set_source(mp.getLocalName());
+				// t.set_source(mp.getLocalName());
 				t.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
 				
 				System.out.println("Sending a NACK to " + node.getKey()
