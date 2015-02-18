@@ -84,9 +84,14 @@ public class MulticastService {
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
 		int R_for_sender = groupDelivers.get(m.get_source());
-		String missingSender; // sender whose message was missed. 
+	
+		// decide what to do now
+		if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
+			// duplicate
+			return;
+		} 
 
-		//first insert into queue
+		// insert message into queue
 		insertInHoldBackQueue(groupName, m);
 		
 		List<Nack> NacksToSend = seenMissingMessages(groupName, m.getACKS());
@@ -101,20 +106,14 @@ public class MulticastService {
 			}
 		}
 
-		// decide what to do now
 		if (m.getGroupSeqNum() > R_for_sender + 1) {
 			// not delivered and not next
 			return;
 		}
-		else if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
-			// duplicate
-			return;
-		} 
-
 		
 		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
-			deliver(m);
-			groupDelivers.put(m.get_source(), R_for_sender + 1);
+			// deliver(m);
+			// groupDelivers.put(m.get_source(), R_for_sender + 1);
 			handleHoldBackQueue(groupName, m.get_source());
 		}
 	}
@@ -188,7 +187,8 @@ public class MulticastService {
 		for(Entry<String, Integer> ack: acks.entrySet()){
 			int nextExpected = delivered.get(groupName).get(ack.getKey());
 			while(ack.getValue() > nextExpected){
-				// send NACK for any ACKed by someone else but not received.
+				
+				// send NACK to everyone in the group.
 				Nack req = new Nack(groupName, ack.getKey(), nextExpected);
 				neededNacks.add(req);
 				nextExpected++;
