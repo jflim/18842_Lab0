@@ -235,6 +235,7 @@ public class MulticastService {
 		else{
 			try {
 				cachedMessage.set_dst(m.get_source());
+                cachedMessage.set_source(mp.getLocalName());
 				mp.send(cachedMessage);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -254,7 +255,7 @@ public class MulticastService {
 				return mess;
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -264,9 +265,9 @@ public class MulticastService {
 				+ " SeqNum: " + m.getSeqNum()
 				+ " Dup: " + m.getDup()
 				+ " Timestamp: " + m.getTimeStamp()    
-				+ "\nGroup Name: " + m.getGroupName()
+				+ "\nGroupName: " + m.getGroupName()
 				+ ", Src: " + m.get_source() 
-				+ "\nGroup Sequence Number: "  + m.getGroupSeqNum());
+				+ " GroupSeqNum: "  + m.getGroupSeqNum() + "\n");
 		
 		
 		if(caches.get(m.getGroupName()).containsKey(m.get_source())){
