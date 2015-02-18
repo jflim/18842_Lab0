@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 import core.Group;
 import core.Message;
 import core.MessagePasser;
+import core.Nack;
 import core.TimeStampedMessage;
 
 public class MulticastService {
@@ -87,11 +89,13 @@ public class MulticastService {
 		//first insert into queue
 		insertInHoldBackQueue(groupName, m);
 		
-		missingSender = seenMissingMessage(groupName, m.getACKS());
-		if(missingSender != null){
+		List<Nack> NacksToSend = seenMissingMessages(groupName, m.getACKS());
+		while(NacksToSend != null){
+			
 			try {
 				 // request missed packet from someone
-				sendNACK(m.getGroupSeqNum(), groupName, missingSender);
+				Nack next = NacksToSend.remove(0);
+				sendNACK(next);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -112,6 +116,33 @@ public class MulticastService {
 			deliver(m);
 			groupDelivers.put(m.get_source(), R_for_sender + 1);
 			handleHoldBackQueue(groupName, m.get_source());
+		}
+	}
+
+	private void sendNACK(Nack next) throws FileNotFoundException {
+		//String groupName = next.
+		String groupName = next.getGroupName();
+		int groupSeqNum = next.getGroupSeqNum();
+		String missingSender = next.getSender();
+		
+		// determine which nodes had delivered the message already
+		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
+			String request = next.toString();
+			Message m = new Message(node.getKey(), "NACK", request);
+			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
+
+			// set Multicast fields
+			t.setNACK(true);
+			t.setGroupName(groupName);
+
+			// set regular fields
+			t.set_source(mp.getLocalName());
+			t.set_seqNum(mp.incSequenceNumber()); // increments seq number
+													// before sending
+
+			System.out.println("Sending a NACK to " + node.getKey());
+			System.out.println("NACK request: " + next.toString());
+			mp.send(t);
 		}
 	}
 
@@ -152,37 +183,18 @@ public class MulticastService {
 	 * @param acks
 	 * @return
 	 */
-	private String seenMissingMessage(String groupName, Map<String, Integer> acks) {
+	private List<Nack> seenMissingMessages(String groupName, Map<String, Integer> acks) {
+		List<Nack> neededNacks = new LinkedList<Nack>();
 		for(Entry<String, Integer> ack: acks.entrySet()){
-			if(ack.getValue() > delivered.get(groupName).get(ack.getKey())){
-				return ack.getKey();
+			int nextExpected = delivered.get(groupName).get(ack.getKey());
+			while(ack.getValue() > nextExpected){
+				// send NACK for any ACKed by someone else but not received.
+				Nack req = new Nack(groupName, ack.getKey(), nextExpected);
+				neededNacks.add(req);
+				nextExpected++;
 			}
 		}
-		return null;
-	}
-
-	private void sendNACK(int groupSeqNum, String groupName,
-			String missingSender) throws FileNotFoundException {
-		// determine which nodes had delivered the message already
-		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
-			if (node.getValue() >= groupSeqNum) {
-				String request = missingSender + ":::" + groupSeqNum;
-				Message m = new Message(node.getKey(), "NACK", request);
-				TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
-				
-				// set Multicast fields
-				t.setNACK(true);
-				t.setGroupName(groupName);
-				
-				// set regular fields
-				// t.set_source(mp.getLocalName());
-				t.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
-				
-				System.out.println("Sending a NACK to " + node.getKey()
-						+ " for: " + groupSeqNum + "from " + missingSender);
-				mp.send(t);
-			}
-		}
+		return neededNacks;
 	}
 
 	private void handleHoldBackQueue(String groupName, String src) {
@@ -227,7 +239,7 @@ public class MulticastService {
 	 */
 	public void handleNACK(TimeStampedMessage m){
 		System.out.println("Handling a NACK from " + m.get_source());
-		TimeStampedMessage cachedMessage = checkCache(m.getGroupName(), m.getData());
+		TimeStampedMessage cachedMessage = checkCache(m.getData());
 		if(cachedMessage == null){
 			System.err.println("Message from Group " + m.getGroupName()
 					+ ", RequestData " + m.getData() + "not stored in cache");
@@ -235,7 +247,6 @@ public class MulticastService {
 		else{
 			try {
 				cachedMessage.set_dst(m.get_source());
-                cachedMessage.set_source(mp.getLocalName());
 				mp.send(cachedMessage);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -244,10 +255,11 @@ public class MulticastService {
 		}
 	}
 	
-	private TimeStampedMessage checkCache(String groupName, String data) {
-		String[] tmp = data.split(":::");
-		String origSrc = tmp[0];
-		int requestMessageSeqNum = Integer.parseInt(tmp[1]);
+	private TimeStampedMessage checkCache(String data) {
+		String[] tmp = data.split(", ");
+		String groupName = tmp[0];
+		String origSrc = tmp[1];
+		int requestMessageSeqNum = Integer.parseInt(tmp[2]);
 		Iterator<TimeStampedMessage> li = caches.get(groupName).get(origSrc).iterator();
 		while(li.hasNext()){
 			TimeStampedMessage mess = li.next();
