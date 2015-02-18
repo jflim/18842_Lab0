@@ -19,9 +19,8 @@ import core.TimeStampedMessage;
 public class MulticastService {
 
 	Map<String, Integer> gSeqNum;
-	Map<String, HashMap<String, Integer>> delivered; // Group for each <member,
-													// delivered>
-	Map<String, HashMap<String, List<TimeStampedMessage>>> holdBackQueues;
+	Map<String, HashMap<String, Integer>> delivered; // Group for each <member, delivered>
+	Map<String, HashMap<String, List<TimeStampedMessage>>> holdBackQueues; // group, list
 	Map<String, HashMap<String, List<TimeStampedMessage>>> caches;
 	MessagePasser mp;
 	
@@ -85,22 +84,10 @@ public class MulticastService {
 		int R_for_sender = groupDelivers.get(m.get_source());
 		String missingSender; // sender whose message was missed. 
 
-		// decide what to do now
-		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
-			deliver(m);
-			groupDelivers.put(m.get_source(), R_for_sender + 1);
-			handleHoldBackQueue(groupName, m.get_source());
-
-		} else if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
-															// duplicate
-			return;
-		} else if (m.getGroupSeqNum() > R_for_sender) { // not delivered and not
-														// next
-			insertInHoldBackQueue(groupName, m);
-		}
+		//first insert into queue
+		insertInHoldBackQueue(groupName, m);
 		
 		missingSender = seenMissingMessage(groupName, m.getACKS());
-		//System.out.println(missingSender);
 		if(missingSender != null){
 			try {
 				 // request missed packet from someone
@@ -110,6 +97,22 @@ public class MulticastService {
 			}
 		}
 
+		// decide what to do now
+		if (m.getGroupSeqNum() > R_for_sender + 1) {
+			// not delivered and not next
+			return;
+		}
+		else if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
+			// duplicate
+			return;
+		} 
+
+		
+		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
+			deliver(m);
+			groupDelivers.put(m.get_source(), R_for_sender + 1);
+			handleHoldBackQueue(groupName, m.get_source());
+		}
 	}
 
 	/**
@@ -172,7 +175,7 @@ public class MulticastService {
 				t.setGroupName(groupName);
 				
 				// set regular fields
-				t.set_source(mp.getLocalName());
+				// t.set_source(mp.getLocalName());
 				t.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
 				
 				System.out.println("Sending a NACK to " + node.getKey()
@@ -188,6 +191,15 @@ public class MulticastService {
 		if(li == null){ // holdBackQueue not even initialized
 			return;
 		}
+		
+		//find smallest R and check if we satisfy R
+		
+		// while satisfy R:
+		//     deliver
+		//	   find next smallest R and check if we satisfy R
+		// else: 
+		//    return
+		
 		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
 		ListIterator<TimeStampedMessage> listItor = li.listIterator();
 		while(listItor.hasNext()){
