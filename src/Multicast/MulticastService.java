@@ -114,7 +114,7 @@ public class MulticastService {
 		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
 			// deliver(m);
 			// groupDelivers.put(m.get_source(), R_for_sender + 1);
-			handleHoldBackQueue(groupName, m.get_source());
+			handleHoldBackQueue(groupName);
 		}
 	}
 
@@ -197,14 +197,14 @@ public class MulticastService {
 		return neededNacks;
 	}
 
-	private void handleHoldBackQueue(String groupName, String src) {
-		List<TimeStampedMessage> li = holdBackQueues.get(groupName).get(src);
-		
-		if(li == null){ // holdBackQueue not even initialized
-			return;
-		}
-		
-		//find smallest R and check if we satisfy R
+	private void handleHoldBackQueue(String groupName) {
+//		List<TimeStampedMessage> li = holdBackQueues.get(groupName).get(src);
+//
+//		if(li == null){ // holdBackQueue not even initialized
+//			return;
+//		}
+//
+//		//find smallest R and check if we satisfy R
 		
 		// while satisfy R:
 		//     deliver
@@ -212,40 +212,73 @@ public class MulticastService {
 		// else: 
 		//    return
         HashMap<String, List<TimeStampedMessage>> holdqueue = holdBackQueues.get(groupName);
-        Map<String, Integer> minAcks = holdqueue.get(mp.getLocalName()).get(0).getACKS();
+        TimeStampedMessage minAcksMessage = null;
         for(String process: holdqueue.keySet()){
             for(int i = 0; i < holdqueue.get(process).size(); i ++) {
+                if(minAcksMessage == null)
+                    minAcksMessage = holdqueue.get(process).get(i);
                 TimeStampedMessage t = holdqueue.get(process).get(i);
                 boolean isLess = true;
                 for (String name : t.getACKS().keySet()) {
-                    if(t.getACKS().get(name) > minAcks.get(name)){
+                    if(t.getACKS().get(name) > minAcksMessage.getACKS().get(name)){
                         isLess = false;
                     }
                 }
                 if(isLess == true)
-                    minAcks =t.getACKS();
+                    minAcksMessage = t;
             }
         }
+        HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+        boolean satisfy = true;
+        while(satisfy) {
+            satisfy = true;
+            for(String name: groupDelivers.keySet()){
+                if(groupDelivers.get(name) < minAcksMessage.getACKS().get(name))
+                    satisfy = false;
 
-
-		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
-		ListIterator<TimeStampedMessage> listItor = li.listIterator();
-		while(listItor.hasNext()){
-			TimeStampedMessage tm = listItor.next();
-			if(tm.getGroupSeqNum() == groupDelivers.get(src) + 1){
-				groupDelivers.put(src, groupDelivers.get(src) + 1);
-				listItor.remove();
-				TimeStampedMessage expectedMessage = new TimeStampedMessage(tm);
+            }
+            if(satisfy == true){
+                groupDelivers.put(minAcksMessage.get_source(), groupDelivers.get(minAcksMessage.get_source()) + 1);
+                holdqueue.remove(minAcksMessage);
+				TimeStampedMessage expectedMessage = new TimeStampedMessage(minAcksMessage);
 				deliver(expectedMessage);
-			}
-			else if(tm.getGroupSeqNum() <= groupDelivers.get(src)){
-				listItor.remove();
-				continue; // if we somehow had a duplicate..
-			}
-			else{
-				break; // no more expected
-			}
-		}
+
+                //find next message withmin acks
+                for(String process: holdqueue.keySet()){
+                    for(int i = 0; i < holdqueue.get(process).size(); i ++) {
+                        if(minAcksMessage == null)
+                            minAcksMessage = holdqueue.get(process).get(i);
+                        TimeStampedMessage t = holdqueue.get(process).get(i);
+                        boolean isLess = true;
+                        for (String name : t.getACKS().keySet()) {
+                            if(t.getACKS().get(name) > minAcksMessage.getACKS().get(name)){
+                                isLess = false;
+                            }
+                        }
+                        if(isLess == true)
+                            minAcksMessage = t;
+                    }
+                }
+            }
+        }
+//		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+//		ListIterator<TimeStampedMessage> listItor = li.listIterator();
+//		while(listItor.hasNext()){
+//			TimeStampedMessage tm = listItor.next();
+//			if(tm.getGroupSeqNum() == groupDelivers.get(src) + 1){
+//				groupDelivers.put(src, groupDelivers.get(src) + 1);
+//				listItor.remove();
+//				TimeStampedMessage expectedMessage = new TimeStampedMessage(tm);
+//				deliver(expectedMessage);
+//			}
+//			else if(tm.getGroupSeqNum() <= groupDelivers.get(src)){
+//				listItor.remove();
+//				continue; // if we somehow had a duplicate..
+//			}
+//			else{
+//				break; // no more expected
+//			}
+//		}
 
 	}
 
