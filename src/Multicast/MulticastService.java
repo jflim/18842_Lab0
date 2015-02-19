@@ -211,13 +211,29 @@ public class MulticastService {
 		//	   find next smallest R and check if we satisfy R
 		// else: 
 		//    return
-		
+        HashMap<String, List<TimeStampedMessage>> holdqueue = holdBackQueues.get(groupName);
+        Map<String, Integer> minAcks = holdqueue.get(mp.getLocalName()).get(0).getACKS();
+        for(String process: holdqueue.keySet()){
+            for(int i = 0; i < holdqueue.get(process).size(); i ++) {
+                TimeStampedMessage t = holdqueue.get(process).get(i);
+                boolean isLess = true;
+                for (String name : t.getACKS().keySet()) {
+                    if(t.getACKS().get(name) > minAcks.get(name)){
+                        isLess = false;
+                    }
+                }
+                if(isLess == true)
+                    minAcks =t.getACKS();
+            }
+        }
+
+
 		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
 		ListIterator<TimeStampedMessage> listItor = li.listIterator();
 		while(listItor.hasNext()){
 			TimeStampedMessage tm = listItor.next();
 			if(tm.getGroupSeqNum() == groupDelivers.get(src) + 1){
-				groupDelivers.put(src, groupDelivers.get(src) +1);
+				groupDelivers.put(src, groupDelivers.get(src) + 1);
 				listItor.remove();
 				TimeStampedMessage expectedMessage = new TimeStampedMessage(tm);
 				deliver(expectedMessage);
