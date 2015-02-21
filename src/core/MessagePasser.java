@@ -225,15 +225,9 @@ public class MessagePasser {
             return;
         }
         isProcessedRules = false;
-        //System.out.println("Send: " + message.data + " to " + message.dest + " Seqnum: " + message.seqNum + " Timestamp: " + message.getTimeStamp());
-        System.out.println("Send: " + message.getData()
-                + " Kind: " + message.getKind()
-                + " SeqNum: " + message.getSeqNum()
-                + " Dup: " + message.getDup()
-                + " Timestamp: " + message.getTimeStamp()
-                + "\nGroupName: " + message.getGroupName()
-                + ", Src: " + message.get_source()
-                + " GroupSeqNum: "  + message.getGroupSeqNum() + "\n");
+        
+        // print message information in client
+        message.displayMessageInfo("Send");
 
         for (LinkedHashMap<String, Object> rule : sendRules) {
             if (checkRule(message, rule)) {
@@ -249,6 +243,9 @@ public class MessagePasser {
             }
         }
     }
+
+
+
 
     /**
      * Check an incoming message with the receive rules. First rule that matches
@@ -299,7 +296,8 @@ public class MessagePasser {
 
         if (rule.containsKey("src")
                 && !((String) rule.get("src")).equalsIgnoreCase(message.src)) {
-            return false;
+        	return false;
+        	       	
         }
 
         if (rule.containsKey("dest")
@@ -319,6 +317,12 @@ public class MessagePasser {
                 && !(rule.get("duplicate").equals(message.dup))) {
             return false;
         }
+        
+    	// added for multicast
+    	if(rule.containsKey("origSrc") && 
+    			!((String) rule.get("origSrc")).equalsIgnoreCase(message.getOrigSender())){
+    		return false;
+    	}
 
         return true;
     }
@@ -419,8 +423,14 @@ public class MessagePasser {
      * @throws ClassNotFoundException
      */
     public void receive(Socket socket, ObjectInputStream input) throws ClassNotFoundException, IOException {
-        TimeStampedMessage receivedMessage = (TimeStampedMessage) input.readObject();
-        // may throw IO exception.
+        TimeStampedMessage receivedMessage = null;
+    	try {
+        	receivedMessage = (TimeStampedMessage) input.readObject();
+            // may throw IO exception.
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
+        
 
         //add the socket and stream of the sender.
         if (!sockets.containsKey(receivedMessage.src)) {

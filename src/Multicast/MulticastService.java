@@ -55,25 +55,46 @@ public class MulticastService {
 		delivered.put(g.getName(), deliverGroup);
 	}
 
-	public void send_multicast(String groupName, TimeStampedMessage m)
+	public synchronized void send_multicast(String groupName, TimeStampedMessage m, boolean resent)
 			throws FileNotFoundException {
 
+		/*
 		// count its own as delivered.
-				String self = mp.getLocalName();
-				HashMap<String, Integer> groupDelivers = delivered.get(groupName);
-				groupDelivers.put(self, groupDelivers.get(self)+1);
-
-		//increment the sequence number before sending
-		this.gSeqNum.put(groupName, gSeqNum.get(groupName)+1);
+		String self = mp.getLocalName();
+		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+		groupDelivers.put(self, groupDelivers.get(self)+1);
+		 *
+		 */
+		
+		if(!resent){
+			//increment the sequence number before sending
+			this.gSeqNum.put(groupName, gSeqNum.get(groupName)+1);
+		}
+		
 		int selfGroupSeqNum = this.gSeqNum.get(groupName);
 		
-		System.out.println("Delivered ACKs in multicast");
-		System.out.println(delivered.get(groupName));
+		//System.out.println("Delivered ACKs in multicast");
+		//System.out.println(delivered.get(groupName));
 		for (String targetNode : delivered.get(groupName).keySet()) {
+				
 			TimeStampedMessage tm = new TimeStampedMessage(m);
-			tm.addGroupSeqNum(selfGroupSeqNum);
-			tm.addACKs(delivered.get(groupName));
-
+		
+			// don't resend to original sender
+			// and don't change the values from before
+			if(resent){/*
+				if(targetNode.equals(mp.getLocalName()) || // don't resend to self
+						targetNode.equals(tm.get_source()) || // don't resend to sender
+						targetNode.equals(tm.getOrigSender())){ // don't resend to sender
+					continue;
+				}
+				*/
+				tm.changeSender(mp.getLocalName());	
+			}
+			else{
+				tm.addGroupSeqNum(selfGroupSeqNum);
+				tm.addACKs(delivered.get(groupName));
+			}
+			
 			// set the dest
 			tm.set_dst(targetNode);
 			mp.send(tm);
@@ -82,28 +103,39 @@ public class MulticastService {
 		
 	}
 
-	public void receive_multicast(String groupName, TimeStampedMessage m) {
-		//System.out.println("In receive_multicast");
-		//System.out.println(m.getGroupSeqNum());
-		
+	public synchronized void receive_multicast(String groupName, TimeStampedMessage m) {
+
 		if(m.getNACK() == true){
 			handleNACK(m);
 			return;
 		}
 
 		Map<String, Integer> groupDelivers = delivered.get(groupName);
-		int R_for_sender = groupDelivers.get(m.get_source());
+		String sender = m.getOrigSender();
+		if(sender == null){
+			sender = m.get_source();
+		}
+		
+		int R_for_sender = groupDelivers.get(sender);
 	
+		
 		// decide what to do now
 		if (m.getGroupSeqNum() <= R_for_sender) { // already handled,
 			// duplicate
 			return;
 		} 
 
+		// send to everyone else if not received before
+		try {
+			TimeStampedMessage copy = new TimeStampedMessage(m);
+			send_multicast(groupName, copy, true);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		// insert message into queue
 		insertInHoldBackQueue(groupName, m);
-		System.out.println("inserting in HBQ");
-		System.out.println(m.getACKS());
 
 		// not delivered and not next expected from this sender
 		// send any NACKS for missing messages
@@ -170,9 +202,14 @@ public class MulticastService {
 	private void insertInHoldBackQueue(String groupName, TimeStampedMessage m) {
 
 		HashMap<String, List<TimeStampedMessage>> groupQueue = holdBackQueues.get(groupName);
-		if(groupQueue.containsKey(m.get_source())){
-			List<TimeStampedMessage> hbList = groupQueue.get(m.get_source());
-			groupQueue.get(m.get_source()).add(m);
+		String source = m.getOrigSender();
+		if(source == null){
+			source = m.get_source();
+		}
+		
+		if(groupQueue.containsKey(source)){
+			List<TimeStampedMessage> hbList = groupQueue.get(source);
+			groupQueue.get(source).add(m);
 			Collections.sort(hbList, new Comparator<TimeStampedMessage>(){
 				public int compare(TimeStampedMessage first, TimeStampedMessage second){
 					if(first.getGroupSeqNum() < second.getGroupSeqNum()){
@@ -187,7 +224,7 @@ public class MulticastService {
 		else{ // not initialized yet
 			List<TimeStampedMessage> li = new LinkedList<TimeStampedMessage>();
 			li.add(m);
-			groupQueue.put(m.get_source(), li);
+			groupQueue.put(source, li);
 		}
 
 	}
@@ -223,8 +260,7 @@ public class MulticastService {
 		// locate the smallest R in this group's holdBackQueues.
         HashMap<String, List<TimeStampedMessage>> holdqueue = holdBackQueues.get(groupName);
 
-        boolean satisfy = true;
-		while (satisfy) {
+		while (true) {
 			TimeStampedMessage minAcksMessage = null;
 			for (String process : holdqueue.keySet()) {
 				boolean isLess = true;
@@ -259,8 +295,8 @@ public class MulticastService {
 				return; 
 			}
 			
-			System.out.println("GroupSeqNum of minAck: " + minAcksMessage.getGroupSeqNum());
-			System.out.println("ACKS of minAck: " + minAcksMessage.getACKS());
+			//System.out.println("GroupSeqNum of minAck: " + minAcksMessage.getGroupSeqNum());
+			//System.out.println("ACKS of minAck: " + minAcksMessage.getACKS());
 		
 			// check how many messages in minAcksMessage ACKs are not delivered
 			// for the local
@@ -276,15 +312,24 @@ public class MulticastService {
 				}
 			}
 			
-			if (difference == 1) {
-				String name = minAcksMessage.get_source();
+			if (difference <= 0) {
+				
+				// account for a resent message
+				String name = minAcksMessage.getOrigSender();
+				if(name == null){
+					name = minAcksMessage.get_source();
+				}
+				
+				//System.out.println(name + "::" + groupDelivers.get(name));
+				//System.out.println("minACKSEqNUM: " + minAcksMessage.getGroupSeqNum());
 				if (minAcksMessage.getGroupSeqNum() == groupDelivers.get(name) + 1) {
 					groupDelivers.put(name, groupDelivers.get(name) + 1);
-					holdqueue.get(minAcksMessage.get_source()).remove(minAcksMessage);
+					holdqueue.get(name).remove(minAcksMessage);
 					TimeStampedMessage expectedMessage = new TimeStampedMessage(minAcksMessage);
 					deliver(expectedMessage);
 					continue;
 				}
+
 			} else {
 				// send any NACKS for missing messages
 				List<Nack> NacksToSend = seenMissingMessages(groupName,

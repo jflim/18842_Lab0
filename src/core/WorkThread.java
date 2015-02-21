@@ -58,11 +58,14 @@ public class WorkThread implements Runnable{
 
                         }
                         else{
-						System.out.println("Data: " + processedMessage.data
-								+ " SeqNum: " + processedMessage.seqNum
-								+ " Duplicate: " + processedMessage.dup
-								+ " Timestamp: "
-								+ processedMessage.getTimeStamp());
+                        // print message information in client
+                        processedMessage.displayMessageInfo("Received");
+//						System.out.println("Received: "
+//								+ "Data: " + processedMessage.data
+//								+ " SeqNum: " + processedMessage.seqNum
+//								+ " Duplicate: " + processedMessage.dup
+//								+ " Timestamp: "
+//								+ processedMessage.getTimeStamp());
                         }
 						
 						// log message
