@@ -2,6 +2,7 @@ package core;
 import Clock.ClockService;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +23,6 @@ public class TimeStampedMessage extends Message implements Serializable{
 			ClockService timeStamp) {
 		super(dest, kind, data);
         this.timeStamp = timeStamp.copy();
-
     }
 
     public TimeStampedMessage(TimeStampedMessage message) {
@@ -31,13 +31,12 @@ public class TimeStampedMessage extends Message implements Serializable{
         this.groupName = message.groupName;
         this.groupSeqNum = message.groupSeqNum;
         this.NACK = message.NACK;
+        this.ACKs = message.ACKs;
     }
 
     public TimeStampedMessage(Message message, ClockService timeStamp) {
         super(message);
         this.timeStamp = timeStamp.copy();
-        
-
     }
 
     public TimeStampedMessage(String dest, String kind, Object data,
@@ -45,8 +44,8 @@ public class TimeStampedMessage extends Message implements Serializable{
         super(dest, kind, data);
         this.timeStamp = timeStamp.copy();
         this.groupName = num;
-
     }
+    
     // These setters are used by MessagePasser.send, not the app
     public void set_source(String source) {
         this.src = source;
@@ -77,7 +76,8 @@ public class TimeStampedMessage extends Message implements Serializable{
     }
     
     public void addACKs(Map<String, Integer> R){
-    	this.ACKs = R;
+    	this.ACKs = new HashMap();
+    	this.ACKs.putAll(R); // need to deep copy or incorrect values at receiver
     }
     
     public void setNACK(boolean value){

@@ -432,7 +432,7 @@ public class MessagePasser {
                 this.addConnectionStreams(input, output);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-            	e.printStackTrace();
+            	// e.printStackTrace();
             }
 
         }

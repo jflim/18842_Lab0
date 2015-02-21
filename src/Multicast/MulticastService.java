@@ -57,11 +57,18 @@ public class MulticastService {
 
 	public void send_multicast(String groupName, TimeStampedMessage m)
 			throws FileNotFoundException {
-		
+
+		// count its own as delivered.
+				String self = mp.getLocalName();
+				HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+				groupDelivers.put(self, groupDelivers.get(self)+1);
+
 		//increment the sequence number before sending
 		this.gSeqNum.put(groupName, gSeqNum.get(groupName)+1);
 		int selfGroupSeqNum = this.gSeqNum.get(groupName);
-
+		
+		System.out.println("Delivered ACKs in multicast");
+		System.out.println(delivered.get(groupName));
 		for (String targetNode : delivered.get(groupName).keySet()) {
 			TimeStampedMessage tm = new TimeStampedMessage(m);
 			tm.addGroupSeqNum(selfGroupSeqNum);
@@ -71,6 +78,8 @@ public class MulticastService {
 			tm.set_dst(targetNode);
 			mp.send(tm);
 		}
+		
+		
 	}
 
 	public void receive_multicast(String groupName, TimeStampedMessage m) {
@@ -93,39 +102,45 @@ public class MulticastService {
 
 		// insert message into queue
 		insertInHoldBackQueue(groupName, m);
-		
-		List<Nack> NacksToSend = seenMissingMessages(groupName, m.getACKS());
-		while(NacksToSend != null){
-			
-			try {
-				 // request missed packet from someone
-				Nack next = NacksToSend.remove(0);
-				sendNACK(next);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
+		System.out.println("inserting in HBQ");
+		System.out.println(m.getACKS());
 
+		// not delivered and not next expected from this sender
+		// send any NACKS for missing messages
 		if (m.getGroupSeqNum() > R_for_sender + 1) {
-			// not delivered and not next
+			List<Nack> NacksToSend = seenMissingMessages(groupName, m.getACKS());
+			while(!NacksToSend.isEmpty()){
+				
+				try {
+					 // request missed packet from someone
+					Nack next = NacksToSend.remove(0);
+					sendNACK(next);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
 			return;
 		}
 		
 		if (m.getGroupSeqNum() == R_for_sender + 1) { // next expected Message
-			// deliver(m);
-			// groupDelivers.put(m.get_source(), R_for_sender + 1);
+			System.out.println("next expected from a process");
 			handleHoldBackQueue(groupName);
 		}
 	}
 
 	private void sendNACK(Nack next) throws FileNotFoundException {
-		//String groupName = next.
 		String groupName = next.getGroupName();
 		int groupSeqNum = next.getGroupSeqNum();
 		String missingSender = next.getSender();
 		
-		// determine which nodes had delivered the message already
+		// send NACK to everyone in group except self for the missing message
 		for (Entry<String, Integer> node : delivered.get(groupName).entrySet()) {
+			
+			// don't send NACK to self
+			if(node.getKey().equals(mp.getLocalName())){
+				continue;
+			}
+			
 			String request = next.toString();
 			Message m = new Message(node.getKey(), "NACK", request);
 			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
@@ -137,7 +152,7 @@ public class MulticastService {
 			// set regular fields
 			t.set_source(mp.getLocalName());
 			t.set_seqNum(mp.incSequenceNumber()); // increments seq number
-													// before sending
+											      // before sending
 
 			System.out.println("Sending a NACK to " + node.getKey());
 			System.out.println("NACK request: " + next.toString());
@@ -188,6 +203,11 @@ public class MulticastService {
 			int nextExpected = delivered.get(groupName).get(ack.getKey());
 			while(ack.getValue() > nextExpected){
 				
+				// TODO: catch to change
+				if(nextExpected == 0){
+					nextExpected++;
+				}
+				
 				// send NACK to everyone in the group.
 				Nack req = new Nack(groupName, ack.getKey(), nextExpected);
 				neededNacks.add(req);
@@ -198,88 +218,90 @@ public class MulticastService {
 	}
 
 	private void handleHoldBackQueue(String groupName) {
-//		List<TimeStampedMessage> li = holdBackQueues.get(groupName).get(src);
-//
-//		if(li == null){ // holdBackQueue not even initialized
-//			return;
-//		}
-//
-//		//find smallest R and check if we satisfy R
+
 		
-		// while satisfy R:
-		//     deliver
-		//	   find next smallest R and check if we satisfy R
-		// else: 
-		//    return
+		// locate the smallest R in this group's holdBackQueues.
         HashMap<String, List<TimeStampedMessage>> holdqueue = holdBackQueues.get(groupName);
-        TimeStampedMessage minAcksMessage = null;
-        for(String process: holdqueue.keySet()){
-            for(int i = 0; i < holdqueue.get(process).size(); i ++) {
-                if(minAcksMessage == null)
-                    minAcksMessage = holdqueue.get(process).get(i);
-                TimeStampedMessage t = holdqueue.get(process).get(i);
-                boolean isLess = true;
-                for (String name : t.getACKS().keySet()) {
-                    if(t.getACKS().get(name) > minAcksMessage.getACKS().get(name)){
-                        isLess = false;
-                    }
-                }
-                if(isLess == true)
-                    minAcksMessage = t;
-            }
-        }
-        HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+
         boolean satisfy = true;
-        while(satisfy) {
-            satisfy = true;
-            for(String name: groupDelivers.keySet()){
-                if(groupDelivers.get(name) < minAcksMessage.getACKS().get(name))
-                    satisfy = false;
+		while (satisfy) {
+			TimeStampedMessage minAcksMessage = null;
+			for (String process : holdqueue.keySet()) {
+				boolean isLess = true;
+				if (holdqueue.get(process) == null
+						|| holdqueue.get(process).size() == 0) {
+					continue;
+				}
 
-            }
-            if(satisfy == true){
-                groupDelivers.put(minAcksMessage.get_source(), groupDelivers.get(minAcksMessage.get_source()) + 1);
-                holdqueue.remove(minAcksMessage);
-				TimeStampedMessage expectedMessage = new TimeStampedMessage(minAcksMessage);
-				deliver(expectedMessage);
+				// assume that sorted by groupseqnum per process --> sorted by
+				// min R 0in process's HoldBackQueues
+				
+				TimeStampedMessage t = holdqueue.get(process).get(0);
 
-                //find next message withmin acks
-                for(String process: holdqueue.keySet()){
-                    for(int i = 0; i < holdqueue.get(process).size(); i ++) {
-                        if(minAcksMessage == null)
-                            minAcksMessage = holdqueue.get(process).get(i);
-                        TimeStampedMessage t = holdqueue.get(process).get(i);
-                        boolean isLess = true;
-                        for (String name : t.getACKS().keySet()) {
-                            if(t.getACKS().get(name) > minAcksMessage.getACKS().get(name)){
-                                isLess = false;
-                            }
-                        }
-                        if(isLess == true)
-                            minAcksMessage = t;
-                    }
-                }
-            }
-        }
-//		HashMap<String, Integer> groupDelivers = delivered.get(groupName);
-//		ListIterator<TimeStampedMessage> listItor = li.listIterator();
-//		while(listItor.hasNext()){
-//			TimeStampedMessage tm = listItor.next();
-//			if(tm.getGroupSeqNum() == groupDelivers.get(src) + 1){
-//				groupDelivers.put(src, groupDelivers.get(src) + 1);
-//				listItor.remove();
-//				TimeStampedMessage expectedMessage = new TimeStampedMessage(tm);
-//				deliver(expectedMessage);
-//			}
-//			else if(tm.getGroupSeqNum() <= groupDelivers.get(src)){
-//				listItor.remove();
-//				continue; // if we somehow had a duplicate..
-//			}
-//			else{
-//				break; // no more expected
-//			}
-//		}
+				if (minAcksMessage == null) {
+					minAcksMessage = t;
+					continue;
+				} else { // compare ACKS to see which one is smaller
+					for (String name : t.getACKS().keySet()) {
+						if (t.getACKS().get(name) > minAcksMessage.getACKS()
+								.get(name)) {
+							isLess = false;
+						}
+					}
+					if (isLess == true) {
+						minAcksMessage = t;
+					}
+				}
+			}
 
+			// do nothing if no messages in the holdbackqueues.
+			if(minAcksMessage == null){
+				return; 
+			}
+			
+			System.out.println("GroupSeqNum of minAck: " + minAcksMessage.getGroupSeqNum());
+			System.out.println("ACKS of minAck: " + minAcksMessage.getACKS());
+		
+			// check how many messages in minAcksMessage ACKs are not delivered
+			// for the local
+
+			HashMap<String, Integer> groupDelivers = delivered.get(groupName);
+
+			int difference = 0;
+			for (String name : groupDelivers.keySet()) {
+				int localDel = groupDelivers.get(name);
+				int minACKsMessageDel = minAcksMessage.getACKS().get(name);
+				if (groupDelivers.get(name) < minAcksMessage.getACKS().get(name)) {
+					difference += (minACKsMessageDel-localDel);
+				}
+			}
+			
+			if (difference == 1) {
+				String name = minAcksMessage.get_source();
+				if (minAcksMessage.getGroupSeqNum() == groupDelivers.get(name) + 1) {
+					groupDelivers.put(name, groupDelivers.get(name) + 1);
+					holdqueue.get(minAcksMessage.get_source()).remove(minAcksMessage);
+					TimeStampedMessage expectedMessage = new TimeStampedMessage(minAcksMessage);
+					deliver(expectedMessage);
+					continue;
+				}
+			} else {
+				// send any NACKS for missing messages
+				List<Nack> NacksToSend = seenMissingMessages(groupName,
+						minAcksMessage.getACKS());
+				while (!NacksToSend.isEmpty()) {
+
+					try {
+						// request missed packet from someone
+						Nack next = NacksToSend.remove(0);
+						sendNACK(next);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+				return;
+			}
+		}
 	}
 
 	/**
@@ -291,7 +313,7 @@ public class MulticastService {
 		TimeStampedMessage cachedMessage = checkCache(m.getData());
 		if(cachedMessage == null){
 			System.err.println("Message from Group " + m.getGroupName()
-					+ ", RequestData " + m.getData() + "not stored in cache");
+					+ ", RequestData " + m.getData() + " not stored in cache");
 		}
 		else{
 			try {
@@ -306,9 +328,15 @@ public class MulticastService {
 	
 	private TimeStampedMessage checkCache(String data) {
 		String[] tmp = data.split(", ");
-		String groupName = tmp[0];
-		String origSrc = tmp[1];
-		int requestMessageSeqNum = Integer.parseInt(tmp[2]);
+		String groupName = tmp[0].split(":")[1].replaceAll("\\s","");
+		String origSrc = tmp[1].split(":")[1].replaceAll("\\s","");
+		int requestMessageSeqNum = Integer.parseInt(tmp[2].split(":")[1].replaceAll("\\s",""));
+		
+		//if cache not init yet here
+		if(caches.get(groupName).get(origSrc) == null){
+			return null;
+		}
+		
 		Iterator<TimeStampedMessage> li = caches.get(groupName).get(origSrc).iterator();
 		while(li.hasNext()){
 			TimeStampedMessage mess = li.next();
@@ -328,7 +356,8 @@ public class MulticastService {
 				+ " Timestamp: " + m.getTimeStamp()    
 				+ "\nGroupName: " + m.getGroupName()
 				+ ", Src: " + m.get_source() 
-				+ " GroupSeqNum: "  + m.getGroupSeqNum() + "\n");
+				+ " GroupSeqNum: "  + m.getGroupSeqNum() 
+				+ " ACKS: " + m.getACKS() + "\n");
 		
 		
 		if(caches.get(m.getGroupName()).containsKey(m.get_source())){
