@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
-
+import Multicast.MulticastService.State;
 /**
  * Created by gs on 1/27/15.
  */
@@ -104,10 +104,41 @@ public class ClientThread implements Runnable {
 
 			}
             else if(command.equalsIgnoreCase("request")){
-                
+                messagePasser.multicastService.state = State.WANTED;
+                TimeStampedMessage m = new TimeStampedMessage("", "request",
+                        "", messagePasser.getClock().copy(), groupName);
+                try {
+                    m.set_source(messagePasser.local_name);
+                    m.set_seqNum(messagePasser.seqNum++);
+                    System.out.println(m.get_source());
+                    messagePasser.multicastService.send_multicast(groupName, m, false);
+
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                while(numOfReplies < K){
+
+                }
+
+                messagePasser.multicastService.state = State.HELD;
+
             }
             else if(command.equalsIgnoreCase("release")){
+                messagePasser.multicastService.state = State.RELEASED;
+                TimeStampedMessage m = new TimeStampedMessage("", "release",
+                        "", messagePasser.getClock().copy(), groupName);
+                try {
+                    m.set_source(messagePasser.local_name);
+                    m.set_seqNum(messagePasser.seqNum++);
+                    System.out.println(m.get_source());
+                    messagePasser.multicastService.send_multicast(groupName, m, false);
 
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
 
             }
 		}

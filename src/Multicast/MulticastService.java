@@ -37,7 +37,7 @@ public class MulticastService {
 
 	// added for Mutual Exclusion functionality
 	boolean voted = false;
-	State state = State.HELD;
+	public State state = State.HELD;
 	
 	// queue holding unprocessed requests for critical section
 	List<TimeStampedMessage> queueCS = new LinkedList<TimeStampedMessage>(); 
