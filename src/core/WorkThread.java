@@ -59,6 +59,11 @@ public class WorkThread implements Runnable{
 						} else {
 							// print message information in client
 							processedMessage.displayMessageInfo("Received");
+
+
+
+
+
 						}
 						// log message
 						//System.out.println("Do you want to log this message? Y: N");

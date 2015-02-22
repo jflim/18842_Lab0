@@ -35,6 +35,7 @@ public class TimeStampedMessage extends Message implements Serializable{
         this.ACKs = message.ACKs;
         this.origSender = message.origSender;
     }
+    
 
     public TimeStampedMessage(Message message, ClockService timeStamp) {
         super(message);

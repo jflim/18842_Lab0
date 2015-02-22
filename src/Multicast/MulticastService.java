@@ -37,8 +37,7 @@ public class MulticastService {
 
 	// added for Mutual Exclusion functionality
 	boolean voted = false;
-	public State state = State.HELD;
-	
+	State state = State.RELEASED;
 	// queue holding unprocessed requests for critical section
 	List<TimeStampedMessage> queueCS = new LinkedList<TimeStampedMessage>(); 
 	
@@ -423,7 +422,7 @@ public class MulticastService {
 			handleReleasedCS();
 		}
 		else if(m.getKind().equals("Request")){
-			handleRequestCS();
+			handleRequestCS(m);
 		}
 	}
 
@@ -487,8 +486,24 @@ public class MulticastService {
 	 * handles any received message from a process requesting
 	 * access for the critical section, CS.
 	 */
-	private void handleRequestCS() {
-		//if()
+	private void handleRequestCS(TimeStampedMessage m) {
+		if(state == State.RELEASED || voted == true){
+			queueCS.add(m);
+		}
+		else{ // send an ACK for the request
+			String name = m.getOrigSender();
+			if(name == null){
+				name = m.get_source();
+			}
+			Message newmes = new Message(name, "Request ACK", "Request ACK");
+			TimeStampedMessage reply = new TimeStampedMessage(newmes, mp.getClock());
+			
+			// set regular fields
+			reply.set_source(mp.getLocalName());
+			reply.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
+			
+			mp.send(reply);
+		}
 		
 	}
 }
