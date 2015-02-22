@@ -481,7 +481,15 @@ public class MulticastService {
 	private void handleReleasedCS(){
 		if(!queueCS.isEmpty()){
 			TimeStampedMessage mes = queueCS.remove(0);
-			mp.send(mes);
+			
+			String name = mes.getOrigSender();
+			if(name == null){
+				name = mes.get_source();
+			}
+			
+			Message newmes = new Message(name, "Request ACK", "Request ACK");
+			TimeStampedMessage reply = new TimeStampedMessage(newmes, mp.getClock());
+			mp.send(reply);
 			voted = true;
 		}
 		else{
