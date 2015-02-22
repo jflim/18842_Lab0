@@ -37,7 +37,7 @@ public class MulticastService {
 
 	// added for Mutual Exclusion functionality
 	boolean voted = false;
-	State state = State.RELEASED;
+	public State state = State.RELEASED;
 	// queue holding unprocessed requests for critical section
 	List<TimeStampedMessage> queueCS = new LinkedList<TimeStampedMessage>(); 
 	
@@ -418,10 +418,10 @@ public class MulticastService {
 	private void deliver(TimeStampedMessage m) {
 		m.displayMessageInfo("Received");		
 		insertInCache(m);
-		if(m.getKind().equals("Released")){
+		if(m.getKind().equalsIgnoreCase("Released")){
 			handleReleasedCS();
 		}
-		else if(m.getKind().equals("Request")){
+		else if(m.getKind().equalsIgnoreCase("Request")){
 			handleRequestCS(m);
 		}
 	}
