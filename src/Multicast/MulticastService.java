@@ -162,6 +162,7 @@ public class MulticastService {
 	}
 
 	private void sendNACK(Nack next) throws FileNotFoundException {
+		System.out.println("sendNack time");
 		String groupName = next.getGroupName();
 		int groupSeqNum = next.getGroupSeqNum();
 		String missingSender = next.getSender();
@@ -243,9 +244,9 @@ public class MulticastService {
 			while(ack.getValue() > nextExpected){
 				
 				// TODO: catch to change
-				if(nextExpected == 0){
-					nextExpected++;
-				}
+				//if(nextExpected == 0){
+				//	nextExpected++;
+				//}
 				
 				// send NACK to everyone in the group.
 				Nack req = new Nack(groupName, ack.getKey(), nextExpected);
