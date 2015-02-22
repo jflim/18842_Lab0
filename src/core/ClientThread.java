@@ -42,20 +42,15 @@ public class ClientThread implements Runnable {
 
 				TimeStampedMessage m = new TimeStampedMessage(target, kind,
 						content, messagePasser.getClock().copy());
-				try {
-					m.set_source(messagePasser.local_name);
-					m.set_seqNum(messagePasser.seqNum++);
-					messagePasser.send(m);
+				m.set_source(messagePasser.local_name);
+				m.set_seqNum(messagePasser.seqNum++);
+				messagePasser.send(m);
 
-					System.out.println("Do you want to log this message? Y: N");// log
-																				// message
-					line = scan.nextLine();
-					if (line.equalsIgnoreCase("Y")) {
-						messagePasser.sendMessageToLogger(m);
-					}
-
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+				System.out.println("Do you want to log this message? Y: N");// log
+																			// message
+				line = scan.nextLine();
+				if (line.equalsIgnoreCase("Y")) {
+					messagePasser.sendMessageToLogger(m);
 				}
 
 			} else if (command.equalsIgnoreCase("exit")) {
