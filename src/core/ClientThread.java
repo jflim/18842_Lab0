@@ -70,6 +70,9 @@ public class ClientThread implements Runnable {
 				messagePasser.multicastService.displayDelivered();
 			}
 
+			else if(command.equalsIgnoreCase("state")){
+				messagePasser.multicastService.displayState();
+			}
 			else if (command.equalsIgnoreCase("multicast")) {
 				if (tmpline.length != 3) {
 					continue;
@@ -103,41 +106,10 @@ public class ClientThread implements Runnable {
 
 			}
             else if(command.equalsIgnoreCase("request")){
-                messagePasser.multicastService.state = State.WANTED;
-                TimeStampedMessage m = new TimeStampedMessage("", "request",
-                        "", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
-                try {
-                    m.set_source(messagePasser.local_name);
-                    m.set_seqNum(messagePasser.seqNum++);
-                    System.out.println(m.get_source());
-                    messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
-
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-                while(messagePasser.numOfReplies < messagePasser.getGroups().get(messagePasser.getLocal_group_name()).memberNames().size()){
-                }
-                messagePasser.numOfReplies = 0;
-                messagePasser.multicastService.state = State.HELD;
-
+            	requestCS();
             }
             else if(command.equalsIgnoreCase("release")){
-                messagePasser.multicastService.state = State.RELEASED;
-                TimeStampedMessage m = new TimeStampedMessage("", "release",
-                        "", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
-                try {
-                    m.set_source(messagePasser.local_name);
-                    m.set_seqNum(messagePasser.seqNum++);
-                    System.out.println(m.get_source());
-                    messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
-
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
+            	releaseCS();
             }
 		}
 	}
@@ -159,7 +131,9 @@ public class ClientThread implements Runnable {
 		System.out.println("time -display the current timestamps");
 		System.out.println("generate -increment timestamp and display");
 		System.out.println("multicast [kind] [group] -multicast a message to a group");
-        System.out.println("request -request resources");
+		System.out.println("displayDelivered -show local delivered");
+		System.out.println("state -displays state information");
+		System.out.println("request -request resources");
         System.out.println("release -release resources");
 
     }
@@ -168,14 +142,44 @@ public class ClientThread implements Runnable {
 	 * Request the critical section
 	 */
 	private void requestCS(){
-		
+        messagePasser.multicastService.state = State.WANTED;
+        TimeStampedMessage m = new TimeStampedMessage("", "request",
+                "request", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
+        try {
+            m.set_source(messagePasser.local_name);
+            m.set_seqNum(messagePasser.seqNum++);
+            System.out.println(m.get_source());
+            messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        while(messagePasser.numOfReplies < messagePasser.getGroups().get(messagePasser.getLocal_group_name()).memberNames().size()){
+        }
+        messagePasser.numOfReplies = 0;
+        messagePasser.multicastService.state = State.HELD;
 	}
 	
 	/**
 	 * Exit from a critical section
 	 */
-	private void exitCS(){
-	
+	private void releaseCS(){
+        messagePasser.multicastService.state = State.RELEASED;
+        TimeStampedMessage m = new TimeStampedMessage("", "release",
+                "release", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
+        try {
+            m.set_source(messagePasser.local_name);
+            m.set_seqNum(messagePasser.seqNum++);
+            System.out.println(m.get_source());
+            messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
 	}
 	
 	

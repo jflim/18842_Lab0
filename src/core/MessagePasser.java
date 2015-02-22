@@ -662,4 +662,7 @@ public class MessagePasser {
     }
 
     public String getLocal_group_name(){ return this.local_group_name;}
+    
+    
+    
 }

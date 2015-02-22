@@ -467,6 +467,12 @@ public class MulticastService {
 		}
 	}
 	
+	public void displayState(){
+		System.out.println("State Information:");
+		System.out.println("voted: " + voted);
+		System.out.println("state: " + state);	
+	}
+	
 	/**
 	 * handles any received message from a process notifying
 	 * that the CS is about to be released
