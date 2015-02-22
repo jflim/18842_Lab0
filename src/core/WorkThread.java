@@ -59,9 +59,8 @@ public class WorkThread implements Runnable{
 						} else {
 							// print message information in client
 							processedMessage.displayMessageInfo("Received");
-
-
-
+                            if(processedMessage.getKind().equalsIgnoreCase("Request ACK"))
+                                messagePasser.numOfReplies++;
 
 
 						}

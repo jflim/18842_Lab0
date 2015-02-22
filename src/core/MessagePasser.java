@@ -42,6 +42,8 @@ public class MessagePasser {
     private boolean isProcessedRules = false;
     private ClockService clock = null;
     private HashMap<String, Group> groups;
+    public int numOfReplies = 0;
+
     public MulticastService multicastService;
     // node configuration
     Map<String, Node> nodes;

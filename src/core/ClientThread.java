@@ -15,7 +15,6 @@ public class ClientThread implements Runnable {
 
 	private MessagePasser messagePasser;
 	private int port;
-
 	public ClientThread(MessagePasser messagePasser) {
 		this.messagePasser = messagePasser;
 	}
@@ -118,10 +117,9 @@ public class ClientThread implements Runnable {
                     e.printStackTrace();
                 }
 
-                while(numOfReplies < K){
-
+                while(messagePasser.numOfReplies < messagePasser.getGroups().get(groupName)){
                 }
-
+                messagePasser.numOfReplies = 0;
                 messagePasser.multicastService.state = State.HELD;
 
             }
