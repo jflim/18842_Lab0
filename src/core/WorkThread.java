@@ -68,6 +68,8 @@ public class WorkThread implements Runnable{
                                     messagePasser.numOfReplies = 0;
                                     messagePasser.multicastService.state = MulticastService.State.HELD;
                                 }
+                                System.out.println("Number of Acks: " +  messagePasser.numOfReplies);
+
                             }
 
 						}

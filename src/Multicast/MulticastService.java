@@ -489,7 +489,12 @@ public class MulticastService {
 			
 			Message newmes = new Message(name, "Request ACK", "Request ACK");
 			TimeStampedMessage reply = new TimeStampedMessage(newmes, mp.getClock());
-			mp.send(reply);
+
+            // set regular fields
+            reply.set_source(mp.getLocalName());
+            reply.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
+
+            mp.send(reply);
 			voted = true;
 		}
 		else{
