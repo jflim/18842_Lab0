@@ -508,6 +508,8 @@ public class MulticastService {
 	 */
 	private void handleRequestCS(TimeStampedMessage m) {
 		if(state == State.HELD || voted == true){
+			System.out.print("Unable to send Request ACK at this time;");
+			System.out.println(" adding message to queue");
 			queueCS.add(m);
 		}
 		else{ // send an ACK for the request
