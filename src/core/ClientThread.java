@@ -156,10 +156,7 @@ public class ClientThread implements Runnable {
             e.printStackTrace();
         }
 
-        while(messagePasser.numOfReplies < messagePasser.getGroups().get(messagePasser.getLocal_group_name()).memberNames().size()){
-        }
-        messagePasser.numOfReplies = 0;
-        messagePasser.multicastService.state = State.HELD;
+
 	}
 	
 	/**
