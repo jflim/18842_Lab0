@@ -129,4 +129,20 @@ public class ClientThread implements Runnable {
 		System.out.println("generate -increment timestamp and display");
 		System.out.println("multicast [kind] [group] -multicast a message to a group");
 	}
+	
+	/**
+	 * Request the critical section
+	 */
+	private void requestCS(){
+		
+	}
+	
+	/**
+	 * Exit from a critical section
+	 */
+	private void exitCS(){
+	
+	}
+	
+	
 }

@@ -21,6 +21,8 @@ import core.TimeStampedMessage;
 
 public class MulticastService {
 
+	
+	// class variables
 	Map<String, Integer> gSeqNum;
 	Map<String, HashMap<String, Integer>> delivered; // Group for each <member, delivered>
 	Map<String, HashMap<String, List<TimeStampedMessage>>> holdBackQueues; // group, list
@@ -30,6 +32,11 @@ public class MulticastService {
 	// cachesize 
 	int cacheSize = 3;
 
+	// added for Mutual Exclusion functionality
+	boolean voted = false;
+	// queue holding unprocessed requests for critical section
+	List<TimeStampedMessage> queueCS = new LinkedList<TimeStampedMessage>(); 
+	
 	public MulticastService(MessagePasser mp) {
 
 		gSeqNum = new HashMap<String, Integer>();
@@ -179,7 +186,7 @@ public class MulticastService {
 			Message m = new Message(node.getKey(), "NACK", request);
 			TimeStampedMessage t = new TimeStampedMessage(m, mp.getClock());
 
-			// set Multicast fields
+			// set multicast fields
 			t.setNACK(true);
 			t.setGroupName(groupName);
 
@@ -410,17 +417,11 @@ public class MulticastService {
 	}
 
 	private void deliver(TimeStampedMessage m) {
-		System.out.println("Data: " + m.getData()
-				+ " Kind: " + m.getKind()
-				+ " SeqNum: " + m.getSeqNum()
-				+ " Dup: " + m.getDup()
-				+ " Timestamp: " + m.getTimeStamp()    
-				+ "\nGroupName: " + m.getGroupName()
-				+ ", Src: " + m.get_source() 
-				+ " GroupSeqNum: "  + m.getGroupSeqNum() 
-				+ " ACKS: " + m.getACKS() + "\n");
-		
-		
+		m.displayMessageInfo("Received");		
+		insertInCache(m);
+	}
+
+	private void insertInCache(TimeStampedMessage m) {
 		if(caches.get(m.getGroupName()).containsKey(m.get_source())){
 			List<TimeStampedMessage> l = caches.get(m.getGroupName()).get(m.get_source());
 			l.add(m);

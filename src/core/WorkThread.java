@@ -45,7 +45,7 @@ public class WorkThread implements Runnable{
 						System.out.println("logging message!");
 					}
 
-                    //normal message
+                    // message not sent to logger
 					else {
 						
 						// adjust clock
@@ -56,25 +56,16 @@ public class WorkThread implements Runnable{
                         if(processedMessage.getGroupSeqNum() != -1 || processedMessage.getNACK() == true){
                             messagePasser.multicastService.receive_multicast(processedMessage.getGroupName(), processedMessage);
 
-                        }
-                        else{
-                        // print message information in client
-                        processedMessage.displayMessageInfo("Received");
-//						System.out.println("Received: "
-//								+ "Data: " + processedMessage.data
-//								+ " SeqNum: " + processedMessage.seqNum
-//								+ " Duplicate: " + processedMessage.dup
-//								+ " Timestamp: "
-//								+ processedMessage.getTimeStamp());
-                        }
-						
+						} else {
+							// print message information in client
+							processedMessage.displayMessageInfo("Received");
+						}
 						// log message
 						//System.out.println("Do you want to log this message? Y: N");
 						//String line = scan.nextLine();
 						//if (line.equalsIgnoreCase("Y")) {
 						//	sendMessageToLogger(processedMessage);
 						//}
-
 					}
 					processedMessage = this.messagePasser.receiveMessage();
 
