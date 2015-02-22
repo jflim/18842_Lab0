@@ -510,6 +510,7 @@ public class MulticastService {
 			reply.set_seqNum(mp.incSequenceNumber()); // increments seq number before sending
 			
 			mp.send(reply);
+			voted = true;
 		}
 		
 	}
