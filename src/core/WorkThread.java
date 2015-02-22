@@ -1,4 +1,6 @@
 package core;
+import Multicast.MulticastService;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -59,9 +61,13 @@ public class WorkThread implements Runnable{
 						} else {
 							// print message information in client
 							processedMessage.displayMessageInfo("Received");
-                            if(processedMessage.getKind().equalsIgnoreCase("Request ACK"))
+                            if(processedMessage.getKind().equalsIgnoreCase("Request ACK")) {
                                 messagePasser.numOfReplies++;
-
+                                if(messagePasser.numOfReplies == messagePasser.getGroups().get(messagePasser.getLocal_group_name()).memberNames().size()){
+                                    messagePasser.numOfReplies = 0;
+                                    messagePasser.multicastService.state = MulticastService.State.HELD;
+                                }
+                            }
 
 						}
 						// log message
