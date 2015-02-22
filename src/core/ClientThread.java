@@ -103,6 +103,13 @@ public class ClientThread implements Runnable {
 				}
 
 			}
+            else if(command.equalsIgnoreCase("request")){
+                
+            }
+            else if(command.equalsIgnoreCase("release")){
+
+
+            }
 		}
 	}
 
@@ -123,7 +130,10 @@ public class ClientThread implements Runnable {
 		System.out.println("time -display the current timestamps");
 		System.out.println("generate -increment timestamp and display");
 		System.out.println("multicast [kind] [group] -multicast a message to a group");
-	}
+        System.out.println("request -request resources");
+        System.out.println("release -release resources");
+
+    }
 	
 	/**
 	 * Request the critical section
