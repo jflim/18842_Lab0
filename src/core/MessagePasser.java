@@ -364,15 +364,7 @@ public class MessagePasser {
      */
     public synchronized void processReceiveRule(String action, TimeStampedMessage message) {
         if (action.equals("drop")) {
-            System.out.println("Drop");
-           /* System.out.println("Data: " + message.getData()
-                    + " Kind: " + message.getKind()
-                    + " SeqNum: " + message.getSeqNum()
-                    + " Dup: " + message.getDup()
-                    + " Timestamp: " + message.getTimeStamp()
-                    + "\nGroupName: " + message.getGroupName()
-                    + ", Src: " + message.get_source()
-                    + " GroupSeqNum: "  + message.getGroupSeqNum() + "\n");*/
+            message.displayMessageInfo("Drop");
             message = null;
             return;
         } else if (action.equals("delay")) { // 1 delayed message
@@ -396,13 +388,18 @@ public class MessagePasser {
      * @param message
      */
 
-    public void send(TimeStampedMessage message) throws FileNotFoundException {
+    public void send(TimeStampedMessage message){
 
         // Add TimeStamp to Message
     	this.getClock().clockIncrement(); // clock increment before sending
     	message.setTimeStamp(this.getClock());
  
-    	getSendRules();
+    	try {
+			getSendRules();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         checkSendRules(message);
 
     }

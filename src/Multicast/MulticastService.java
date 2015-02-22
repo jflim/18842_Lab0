@@ -21,6 +21,9 @@ import core.TimeStampedMessage;
 
 public class MulticastService {
 
+	public enum State{
+		HELD, WANTED, RELEASED,
+	}
 	
 	// class variables
 	Map<String, Integer> gSeqNum;
@@ -34,6 +37,8 @@ public class MulticastService {
 
 	// added for Mutual Exclusion functionality
 	boolean voted = false;
+	State state = State.HELD;
+	
 	// queue holding unprocessed requests for critical section
 	List<TimeStampedMessage> queueCS = new LinkedList<TimeStampedMessage>(); 
 	
@@ -384,13 +389,8 @@ public class MulticastService {
 					+ ", RequestData " + m.getData() + " not stored in cache");
 		}
 		else{
-			try {
-				cachedMessage.set_dst(m.get_source());
-				mp.send(cachedMessage);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			cachedMessage.set_dst(m.get_source());
+			mp.send(cachedMessage);
 		}
 	}
 	
@@ -419,7 +419,14 @@ public class MulticastService {
 	private void deliver(TimeStampedMessage m) {
 		m.displayMessageInfo("Received");		
 		insertInCache(m);
+		if(m.getKind().equals("Released")){
+			handleReleasedCS();
+		}
+		else if(m.getKind().equals("Request")){
+			handleRequestCS();
+		}
 	}
+
 
 	private void insertInCache(TimeStampedMessage m) {
 		if(caches.get(m.getGroupName()).containsKey(m.get_source())){
@@ -459,5 +466,29 @@ public class MulticastService {
 				System.out.println("Member: " + member + ", " + groupDel.get(member));
 			}
 		}
+	}
+	
+	/**
+	 * handles any received message from a process notifying
+	 * that the CS is about to be released
+	 */
+	private void handleReleasedCS(){
+		if(!queueCS.isEmpty()){
+			TimeStampedMessage mes = queueCS.remove(0);
+			mp.send(mes);
+			voted = true;
+		}
+		else{
+			voted = false;
+		}
+	}
+	
+	/**
+	 * handles any received message from a process requesting
+	 * access for the critical section, CS.
+	 */
+	private void handleRequestCS() {
+		//if()
+		
 	}
 }
