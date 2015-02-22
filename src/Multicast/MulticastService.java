@@ -422,6 +422,7 @@ public class MulticastService {
 			handleReleasedCS();
 		}
 		else if(m.getKind().equalsIgnoreCase("Request")){
+			System.out.println("HANDLING REQUEST");
 			handleRequestCS(m);
 		}
 	}
@@ -493,7 +494,7 @@ public class MulticastService {
 	 * access for the critical section, CS.
 	 */
 	private void handleRequestCS(TimeStampedMessage m) {
-		if(state == State.RELEASED || voted == true){
+		if(state == State.HELD || voted == true){
 			queueCS.add(m);
 		}
 		else{ // send an ACK for the request
