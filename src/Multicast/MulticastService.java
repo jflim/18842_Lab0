@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import core.Group;
 import core.Message;
@@ -235,6 +236,7 @@ public class MulticastService {
 	 * @return
 	 */
 	private List<Nack> seenMissingMessages(String groupName, Map<String, Integer> acks) {
+		System.out.println("seenMissingMessages");
 		List<Nack> neededNacks = new LinkedList<Nack>();
 		for(Entry<String, Integer> ack: acks.entrySet()){
 			int nextExpected = delivered.get(groupName).get(ack.getKey());
@@ -256,7 +258,6 @@ public class MulticastService {
 
 	private void handleHoldBackQueue(String groupName) {
 
-		
 		// locate the smallest R in this group's holdBackQueues.
         HashMap<String, List<TimeStampedMessage>> holdqueue = holdBackQueues.get(groupName);
 
@@ -312,7 +313,8 @@ public class MulticastService {
 				}
 			}
 			
-			if (difference <= 0) {
+			System.out.println("diff: " + difference);
+			if (difference <= 1) {
 				
 				// account for a resent message
 				String name = minAcksMessage.getOrigSender();
@@ -320,8 +322,8 @@ public class MulticastService {
 					name = minAcksMessage.get_source();
 				}
 				
-				//System.out.println(name + "::" + groupDelivers.get(name));
-				//System.out.println("minACKSEqNUM: " + minAcksMessage.getGroupSeqNum());
+				System.out.println(name + "::" + groupDelivers.get(name));
+				System.out.println("minACKSEqNUM: " + minAcksMessage.getGroupSeqNum());
 				if (minAcksMessage.getGroupSeqNum() == groupDelivers.get(name) + 1) {
 					groupDelivers.put(name, groupDelivers.get(name) + 1);
 					holdqueue.get(name).remove(minAcksMessage);
@@ -329,6 +331,7 @@ public class MulticastService {
 					deliver(expectedMessage);
 					continue;
 				}
+				return;
 
 			} else {
 				// send any NACKS for missing messages
@@ -430,6 +433,17 @@ public class MulticastService {
 		// init holdBackqueue
 		for(String groupName: delivered.keySet()){
 			holdBackQueues.put(groupName, new HashMap<String, List<TimeStampedMessage>>());
+		}
+	}
+	
+	public void displayDelivered(){
+		Set<String> groups = delivered.keySet();
+		for(String group : groups){
+			System.out.println("GroupName: " + group);
+			HashMap<String, Integer> groupDel = delivered.get(group);
+			for(String member : groupDel.keySet()){
+				System.out.println("Member: " + member + ", " + groupDel.get(member));
+			}
 		}
 	}
 }

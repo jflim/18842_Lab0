@@ -71,6 +71,10 @@ public class ClientThread implements Runnable {
 			else if (command.equalsIgnoreCase("generate")) {
 				System.out.println(messagePasser.incrementClock());
 			}
+			
+			else if(command.equalsIgnoreCase("displayDelivered")){
+				messagePasser.multicastService.displayDelivered();
+			}
 
 			else if (command.equalsIgnoreCase("multicast")) {
 				if (tmpline.length != 3) {
