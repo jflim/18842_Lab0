@@ -105,19 +105,19 @@ public class ClientThread implements Runnable {
             else if(command.equalsIgnoreCase("request")){
                 messagePasser.multicastService.state = State.WANTED;
                 TimeStampedMessage m = new TimeStampedMessage("", "request",
-                        "", messagePasser.getClock().copy(), groupName);
+                        "", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
                 try {
                     m.set_source(messagePasser.local_name);
                     m.set_seqNum(messagePasser.seqNum++);
                     System.out.println(m.get_source());
-                    messagePasser.multicastService.send_multicast(groupName, m, false);
+                    messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
 
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
 
-                while(messagePasser.numOfReplies < messagePasser.getGroups().get(groupName)){
+                while(messagePasser.numOfReplies < messagePasser.getGroups().get(messagePasser.getLocal_group_name())){
                 }
                 messagePasser.numOfReplies = 0;
                 messagePasser.multicastService.state = State.HELD;
@@ -126,12 +126,12 @@ public class ClientThread implements Runnable {
             else if(command.equalsIgnoreCase("release")){
                 messagePasser.multicastService.state = State.RELEASED;
                 TimeStampedMessage m = new TimeStampedMessage("", "release",
-                        "", messagePasser.getClock().copy(), groupName);
+                        "", messagePasser.getClock().copy(), messagePasser.getLocal_group_name());
                 try {
                     m.set_source(messagePasser.local_name);
                     m.set_seqNum(messagePasser.seqNum++);
                     System.out.println(m.get_source());
-                    messagePasser.multicastService.send_multicast(groupName, m, false);
+                    messagePasser.multicastService.send_multicast(messagePasser.getLocal_group_name(), m, false);
 
 
                 } catch (FileNotFoundException e) {

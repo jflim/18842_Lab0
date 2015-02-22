@@ -29,6 +29,7 @@ public class MessagePasser {
     /* class variables */
     String configuration_filename;
     String local_name;
+    String local_group_name;
     public static final int TIMEOUT_IN_SECS = 3;
 
     int seqNum = 0;
@@ -74,6 +75,7 @@ public class MessagePasser {
 			boolean isLogger, List<TimeStampedMessage> logs) {
 		this.configuration_filename = configuration_filename;
         this.local_name = local_name;
+        this.local_group_name = "Group" + local_name.substring(local_name.length() - 1, local_name.length());
 
         nodes = new LinkedHashMap<String, Node>();
         sockets = new HashMap<String, Socket>();
@@ -658,4 +660,6 @@ public class MessagePasser {
     public HashMap<String, Group> getGroups(){
         return this.groups;
     }
+
+    public String getLocal_group_name(){ return this.local_group_name;}
 }
