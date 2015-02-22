@@ -418,7 +418,7 @@ public class MulticastService {
 	private void deliver(TimeStampedMessage m) {
 		m.displayMessageInfo("Received");		
 		insertInCache(m);
-		if(m.getKind().equalsIgnoreCase("Released")){
+		if(m.getKind().equalsIgnoreCase("Release")){
 			handleReleasedCS();
 		}
 		else if(m.getKind().equalsIgnoreCase("Request")){
