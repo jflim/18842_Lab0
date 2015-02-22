@@ -273,8 +273,17 @@ public class MulticastService {
 				// assume that sorted by groupseqnum per process --> sorted by
 				// min R 0in process's HoldBackQueues
 				
+				// hack: delete things that should have been handled already.
 				TimeStampedMessage t = holdqueue.get(process).get(0);
-
+				/*while (t != null) {
+					if (t.getSeqNum() <= delivered.get(groupName).get(process)) {
+						holdqueue.get(process).remove(t);
+						t = holdqueue.get(process).get(0);
+					} else {
+						break;
+					}
+				}*/
+				
 				if (minAcksMessage == null) {
 					minAcksMessage = t;
 					continue;
@@ -313,7 +322,7 @@ public class MulticastService {
 				}
 			}
 			
-			System.out.println("diff: " + difference);
+			//System.out.println("diff: " + difference);
 			if (difference <= 1) {
 				
 				// account for a resent message
@@ -322,8 +331,8 @@ public class MulticastService {
 					name = minAcksMessage.get_source();
 				}
 				
-				System.out.println(name + "::" + groupDelivers.get(name));
-				System.out.println("minACKSEqNUM: " + minAcksMessage.getGroupSeqNum());
+				//System.out.println(name + "::" + groupDelivers.get(name));
+				//System.out.println("minACKSEqNUM: " + minAcksMessage.getGroupSeqNum());
 				if (minAcksMessage.getGroupSeqNum() == groupDelivers.get(name) + 1) {
 					groupDelivers.put(name, groupDelivers.get(name) + 1);
 					holdqueue.get(name).remove(minAcksMessage);
@@ -331,7 +340,10 @@ public class MulticastService {
 					deliver(expectedMessage);
 					continue;
 				}
-				return;
+				//hack remove
+				else if(minAcksMessage.getGroupSeqNum() < groupDelivers.get(name) + 1){
+					holdqueue.get(name).remove(minAcksMessage);
+				}
 
 			} else {
 				// send any NACKS for missing messages
